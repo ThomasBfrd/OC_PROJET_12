@@ -1,0 +1,73 @@
+@use '/src/assets//styles/variables.module.scss';
+
+.card {
+    height: 120px;
+	width: 260px;
+    background-color: #fbfbfb;
+    border: solid 2px blue;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    gap: 15px;
+    border-radius: 20px;
+    padding-left: 15px;
+
+    &-image {
+        height: 60px;
+    }
+
+    &-text {
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+        justify-content: center;
+    }
+
+    &-stats {
+        font-weight: 600;
+        font-size: 1.2rem;
+    }
+
+    &-type {
+        font-weight: 600;
+        font-size: 0.8rem;
+        color: grey;
+    }
+}
+
+@media screen and (max-width: 1440px) {
+    .card {
+        height: 120px;
+        width: 170px;
+        background-color: #fbfbfb;
+        border: solid 2px blue;
+        display: flex;
+        justify-content: start;
+        align-items: center;
+        gap: 15px;
+        border-radius: 20px;
+        padding-left: 15px;
+    
+        &-image {
+            height: 60px;
+        }
+    
+        &-text {
+            display: flex;
+            flex-direction: column;
+            align-items: start;
+            justify-content: center;
+        }
+    
+        &-stats {
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+    
+        &-type {
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: grey;
+        }
+    } 
+}
