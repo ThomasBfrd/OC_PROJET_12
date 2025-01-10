@@ -1,5 +1,5 @@
-import { User } from './interfaces/user.interface'
+import { RootState } from "./store";
 
-const getUsersList = (state: { users: Array<User> }) => state.users;
-
-export { getUsersList };
+export const selectUsers = (state: RootState) => state.users;
+export const selectDataSource = (state: RootState) => state.users.dataSource;
+export const selectStatus = (state: RootState) => state.users.status;
