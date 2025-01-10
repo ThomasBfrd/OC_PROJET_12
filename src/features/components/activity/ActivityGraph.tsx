@@ -2,100 +2,14 @@ import { scaleBand, scaleLinear, select, Selection } from "d3";
 import { useEffect, useRef, useState } from "react";
 import "./ActivityGraph.scss";
 import variables from '/src/assets/styles/variables.module.scss';
-
-const data = [
-  {
-    day: "2020-07-01",
-    kilogram: 80,
-    calories: 240,
-  },
-  {
-    day: "2020-07-02",
-    kilogram: 80,
-    calories: 220,
-  },
-  {
-    day: "2020-07-03",
-    kilogram: 81,
-    calories: 280,
-  },
-  {
-    day: "2020-07-04",
-    kilogram: 81,
-    calories: 290,
-  },
-  {
-    day: "2020-07-05",
-    kilogram: 80,
-    calories: 160,
-  },
-  {
-    day: "2020-07-06",
-    kilogram: 78,
-    calories: 162,
-  },
-  {
-    day: "2020-07-07",
-    kilogram: 76,
-    calories: 390,
-  },
-];
-
-//   const data = [
-//     {
-//        "day": "2020-07-01",
-//        "kilogram": 70,
-//        "calories": 240
-//     },
-//     {
-//        "day": "2020-07-02",
-//        "kilogram": 69,
-//        "calories": 220
-//     },
-//     {
-//        "day": "2020-07-03",
-//        "kilogram": 70,
-//        "calories": 280
-//     },
-//     {
-//        "day": "2020-07-04",
-//        "kilogram": 70,
-//        "calories": 500
-//     },
-//     {
-//        "day": "2020-07-05",
-//        "kilogram": 69,
-//        "calories": 160
-//     },
-//     {
-//        "day": "2020-07-06",
-//        "kilogram": 69,
-//        "calories": 162
-//     },
-//     {
-//        "day": "2020-07-07",
-//        "kilogram": 69,
-//        "calories": 390
-//     }
-//  ]
-
-const kg = data.map((element) => element.kilogram);
-// console.log(kg);
-const minKg = Math.min(...kg) - 3;
-// console.log(minKg);
-const maxKg = Math.max(...kg) + 3;
-// console.log(maxKg);
-const midKg = kg[(kg.length - 1) / 2];
-// console.log(midKg);
-const calories = data.map((element) => element.calories);
-const maxCalories = Math.max(...calories) + 30;
+import { UserActivity } from "../../../app/core/interfaces/user-activity";
 
 const legends = [
   { color: variables.darkgrey, text: "Poids (kg)" },
   { color: variables.red, text: "Calories brûlées (kCal)" },
 ];
 
-export default function ActivityGraph() {
+export default function ActivityGraph({user}: {user: UserActivity | null}) {
   const ref = useRef<SVGSVGElement | null>(null);
   const [selection, setSelection] = useState<null | Selection<
     SVGSVGElement | null,
@@ -105,12 +19,20 @@ export default function ActivityGraph() {
   >>(null);
   const [width, setWidth] = useState<number>(document.body.clientWidth)
 
+  const kg = user?.sessions.map((element) => element.kilogram) || [];
+  const minKg = Math.min(...kg) - 3;
+  const maxKg = Math.max(...kg) + 3;
+  const calories = user?.sessions.map((element) => element.calories) || [];
+  const maxCalories = Math.max(...calories) + 30;
+
   function checkWidth()  {
 
-    return document.body.clientWidth > 1440 ? setWidth(600) : setWidth(650);
+    return window.innerWidth > 1440 ? setWidth(650) : setWidth(750);
   };
 
   useEffect(() => {
+    console.log(user);
+    
     // const svgWidth = 600;
     const svgWidth = width;
     const svgHeight = 200;
@@ -125,8 +47,8 @@ export default function ActivityGraph() {
     checkWidth();
 
     // Etendue des valeurs sur l'axe X
-    const xScale = scaleBand([0, 600])
-      .domain(data.map((_, i) => `${i + 1}`))
+    const xScale = scaleBand()
+      .domain(user?.sessions.map((_, i) => `${i + 1}`) as string[] || [])
       .range([0, svgWidth])
       .align(0.5)
       .padding(1);
@@ -170,7 +92,7 @@ export default function ActivityGraph() {
       // GROUPBAR : Création des barres
       const barGroups = selection
         .selectAll("g.bar-group")
-        .data(data)
+        .data(user?.sessions || [])
         .join("g")
         .attr("class", "bar-group")
         .attr("transform", (_, i) => `translate(${xScale(`${i + 1}`)!}, 0)`)
@@ -280,7 +202,7 @@ export default function ActivityGraph() {
       // Axe X avec ses légendes
       selection
         .selectAll("text.x-axis")
-        .data(data.map((_, i) => `${i + 1}`))
+        .data(user?.sessions.map((_, i) => `${i + 1}`) || [])
         .join("text")
         .attr("class", "x-axis")
         .attr("x", (d) => xScale(d)! + xScale.bandwidth() / 2)
@@ -330,13 +252,13 @@ export default function ActivityGraph() {
     }
 
     return () => window.removeEventListener("resize", handleResize);
-  }, [selection, width]);
+  }, [selection, width, user]);
   return (
-    <div style={{ paddingTop: "100px" }}>
+    <div className="bars-chart" style={{ paddingTop: "100px" }}>
       {/* Création du SVG avec ses dimensions permettant son affichage dans le DOM */}
       <svg
         ref={ref}
-        width={document.body.clientWidth > 1440 ? 550 : 650}
+        width={window.innerWidth > 1440 ? 700 : 800}
         height={250}
         style={{ overflow: "visible" }}
       ></svg>
