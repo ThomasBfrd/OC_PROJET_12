@@ -1,29 +1,28 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
-import { dayTransform } from "../../../app/core/interfaces/user-average";
+import { Selection } from "d3";
+import { dayTransform, UserAverageSession } from "../../../app/core/interfaces/user-average";
 import './AverageSessions.scss';
 
-const LineChartWithHover = () => {
-  const chartRef = useRef();
+const AverageSessions = ({user}: {user: UserAverageSession}) => {
+  const chartRef = useRef<SVGSVGElement | null>(null);
+
+  const [selection, setSelection] = useState<null | Selection<
+    SVGSVGElement | null,
+    unknown,
+    null,
+    undefined
+  >>(null);
 
   useEffect(() => {
-    const originalData2 = {
-      userId: 12,
-      sessions: [
-        { day: 1, sessionLength: 30 },
-        { day: 2, sessionLength: 23 },
-        { day: 3, sessionLength: 45 },
-        { day: 4, sessionLength: 50 },
-        { day: 5, sessionLength: 0 },
-        { day: 6, sessionLength: 0 },
-        { day: 7, sessionLength: 60 },
-      ],
-    };
+
+    // console.log(user);
+    
 
     const data = [
-      { day: "START", sessionLength: originalData2.sessions[0].sessionLength },
-      ...originalData2.sessions,
-      { day: "END", sessionLength: originalData2.sessions[originalData2.sessions.length - 1].sessionLength },
+      { day: "START", sessionLength: user?.sessions[0].sessionLength },
+      ...user?.sessions || [],
+      { day: "END", sessionLength: user?.sessions[user?.sessions.length - 1].sessionLength },
     ];
 
     const margin = { top: 20, right: 20, bottom: 40, left: 50 };
@@ -53,7 +52,7 @@ const LineChartWithHover = () => {
 
     const xOriginal = d3
       .scalePoint()
-      .domain(originalData2.sessions.map((d) => dayTransform[d.day]))
+      .domain(user?.sessions.map((d) => dayTransform[d.day]))
       .range([0, width])
       .padding(0.5);
 
@@ -134,7 +133,7 @@ const LineChartWithHover = () => {
       .on("mousemove", (event) => {
         const [mouseX] = d3.pointer(event);
 
-        const closestPoint = originalData2.sessions.reduce((prev, curr) =>
+        const closestPoint = user?.sessions.reduce((prev, curr) =>
           Math.abs(xOriginal(dayTransform[curr.day]) - mouseX) < Math.abs(xOriginal(dayTransform[prev.day]) - mouseX)
             ? curr
             : prev
@@ -149,9 +148,9 @@ const LineChartWithHover = () => {
         const highlightX = xPos - xOriginal.step() / 2;
         highlightArea.attr("x", highlightX).attr("width", width - highlightX);
       });
-  }, []);
+  }, [user]);
 
   return <div ref={chartRef} width={250} height={250}></div>;
 };
 
-export default LineChartWithHover;
+export default AverageSessions;
