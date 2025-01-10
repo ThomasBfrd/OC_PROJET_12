@@ -22,7 +22,7 @@
 	grid-column-gap: 0px;
 	grid-row-gap: 0px;
 	align-items: center;
-	border: solid 2px blue;
+	// border: solid 2px blue;
 
 	& .cards {
 		grid-area: 1 / 9 / 11 / 11;
@@ -32,7 +32,7 @@
 		height: 100%;
 		width: 100%;
 		padding: 0;
-		margin: 0;
+		margin: 0 0 0 20px;
 
 		& .card-list {
 			// position: relative;
@@ -71,28 +71,38 @@
 	& .average-sessions {
 		grid-area: 7 / 1 / 11 / 4;
 		height: 250px;
-		width: 250px;
+		// width: 250px;
 		background-color: $red;
 		border-radius: 8px;
-		border: solid 2px blue;
+		// border: solid 2px blue;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 	
 	& .performances {
 		grid-area: 7 / 4 / 11 / 7;
 		background-color: $darkgrey;
 		height: 250px;
-		width: 250px;
+		// width: 250px;
 		border-radius: 8px;
-		border: solid 2px blue;
+		// border: solid 2px blue;
+		margin: 0 15px 0 15px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 	
 	& .score {
 		grid-area: 7 / 7 / 11 / 9;
 		background-color: $lightbackground;
 		height: 250px;
-		width: 250px;
+		// width: 250px;
 		border-radius: 8px;
-		border: solid 2px blue;
+		// border: solid 2px blue;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 }
 
@@ -128,7 +138,7 @@
 		display: flex;
 		flex-direction: row;
 		justify-content: flex-end;
-		// align-items: self-start;
+		align-items: center;
 		margin-bottom: 80px;
 		gap: 2%;
 	}
@@ -185,7 +195,7 @@ input:checked+label:after {
         align-items: center;
 		justify-items: center;
 		justify-content: space-between;
-        border: solid 2px blue;
+        // border: solid 2px blue;
 		width: 100%;
     
         & .cards {
@@ -196,7 +206,7 @@ input:checked+label:after {
             height: 100%;
             width: 100%;
             padding: 0;
-            margin: 0;
+            margin: 0 0 15px 0;
     
             & .card-list {
                 // position: relative;
