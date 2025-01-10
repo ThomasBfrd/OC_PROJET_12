@@ -3,44 +3,56 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Dashboard from '../features/pages/Dashboard';
 import Header from '../features/components/header/Header';
 import Aside from '../features/components/aside/Aside';
-import { useEffect, useState } from 'react';
-import { useSelector, useStore, useDispatch } from 'react-redux';
-import { getUserInfos } from '../Api/Api';
-import { User } from './core/interfaces/user.interface';
-import { RootState } from './core/storeType';
-import { getUsersList } from './core/selectors';
+import { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { AppDispatch } from './core/store';
+import { fetchLocalUserInfos, fetchApiUserInfos, fetchLocalUserActivity, fetchLocalUserAverageSessions, fetchLocalUserPerformances, fetchApiUserActivity, fetchApiUserAverageSessions, fetchApiUserPerformances } from './core/userSlice';
+import { selectDataSource, selectStatus, selectUsers } from './core/selectors';
 
 function App() {
 
-  const getUsers = useSelector(getUsersList);
-  const store = useStore<RootState>();
-  const dispatch = useDispatch();
-  const [isDataFetched, setIsDataFetched] = useState(false);
+  const dispatch: AppDispatch = useDispatch();
+  const dataSource = useSelector(selectDataSource);
+  const users = useSelector(selectUsers);
+  const status = useSelector(selectStatus);
 
   useEffect(() => {
-    if (getUsers.length === 0) {
-      const fetchData = async () => {
-        const data = await getUserInfos('local');
-
-        if (!isDataFetched && data) {
-          setIsDataFetched(true);
-          const existingUsers: Array<User> = store.getState().users;
-          const uniqueUsers = data.filter(
-            (user: User) => !existingUsers.includes(user)
-          );
-          console.log(uniqueUsers);
-
-          dispatch({
-            type: "GET_LOCAL_USER",
-            payload: uniqueUsers,
-          });
-        }
-        return () => {};
-      };
-
-      fetchData();
+    if (dataSource === 'local' && !users.localUser.data) {
+        dispatch(fetchLocalUserInfos());
+        dispatch(fetchLocalUserActivity());
+        dispatch(fetchLocalUserAverageSessions());
+        dispatch(fetchLocalUserPerformances());
+    } else if (dataSource === 'api' && !users.apiUser.data) {
+        dispatch(fetchApiUserInfos());
+        dispatch(fetchApiUserActivity());
+        dispatch(fetchApiUserAverageSessions());
+        dispatch(fetchApiUserPerformances());
     }
-  }, [getUsers])
+
+    if (status === 'idle') {
+      console.log('Tout premier appel en local');
+    } else if (status === 'loading') {
+      console.log('appel du local ou api');
+    } else if (status === 'failed') {
+      console.log('erreur dans la récupération des données');
+    }
+
+    if (dataSource === 'local') {
+      console.log('données locales');
+      
+    } else if (dataSource === 'api') {
+      console.log('données API');
+      
+    }
+
+    return () => {};
+
+
+  }, [dataSource, dispatch, status, users.apiUser, users.localUser]);
+
+  if (status === 'loading') {
+    return <div>Chargement...</div>;
+  }
 
   return (
     <>
