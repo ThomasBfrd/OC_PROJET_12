@@ -8,27 +8,7 @@ import {
   UserPerformances,
 } from "../../../app/core/interfaces/user-performance";
 
-const data2: UserPerformances = {
-  userId: 12,
-  kind: {
-    1: "cardio",
-    2: "energy",
-    3: "endurance",
-    4: "strength",
-    5: "speed",
-    6: "intensity",
-  },
-  data: [
-    { value: 80, kind: 1 },
-    { value: 120, kind: 2 },
-    { value: 140, kind: 3 },
-    { value: 50, kind: 4 },
-    { value: 200, kind: 5 },
-    { value: 90, kind: 6 },
-  ],
-};
-
-export default function Performances() {
+export default function Performances({user}: {user: UserPerformances}) {
   const ref = useRef<SVGSVGElement | null>(null);
   const [selection, setSelection] = useState<null | Selection<
     SVGSVGElement | null,
@@ -38,6 +18,8 @@ export default function Performances() {
   >>(null);
 
   useEffect(() => {
+    console.log(user);
+    
     const width = 250;
     const height = 250;
     const svg = d3
@@ -50,15 +32,15 @@ export default function Performances() {
     if (!selection) {
       setSelection(select(ref.current));
     } else {
-// Ajout d'hexagones intérieurs
+      // Ajout d'hexagones intérieurs
       const numberOfHexagons = 5; // Nombre d'hexagones à dessiner
       const hexagonRadius = 80; // Rayon de l'hexagone principal
       
       for (let j = 0; j < numberOfHexagons; j++) {
         const currentRadius =
         hexagonRadius - j * (hexagonRadius / numberOfHexagons); // Rayon réduit
-        const hexagonPoints = data2.data.map((_, i) => {
-          const angle = (i * (2 * Math.PI)) / data2.data.length; // Calcul de l'angle
+        const hexagonPoints = user.data.map((_, i) => {
+          const angle = (i * (2 * Math.PI)) / user.data.length; // Calcul de l'angle
           const x = currentRadius * Math.cos(angle - Math.PI / 2); // Coordonnée X
           const y = currentRadius * Math.sin(angle - Math.PI / 2); // Coordonnée Y
           return { x, y };
@@ -73,8 +55,8 @@ export default function Performances() {
         }
 
               // Calculer les points pour le polygone intérieur basé sur les valeurs des métriques
-      const innerPolygonPoints = data2.data.map((d, i) => {
-        const angle = (i * (2 * Math.PI)) / data2.data.length; // Calcul de l'angle
+      const innerPolygonPoints = user.data.map((d, i) => {
+        const angle = (i * (2 * Math.PI)) / user.data.length; // Calcul de l'angle
         const radius = d.value / 3; // Normaliser la valeur pour le rayon
         const x = radius * Math.cos(angle - Math.PI / 2); // Coordonnée X
         const y = radius * Math.sin(angle - Math.PI / 2); // Coordonnée Y
@@ -95,8 +77,8 @@ export default function Performances() {
           .attr("stroke-width", 2);
 
       // Ajout des labels pour chaque métrique
-      data2.data.forEach((d, i) => {
-        const angle = (i * (2 * Math.PI)) / data2.data.length;
+      user.data.forEach((d, i) => {
+        const angle = (i * (2 * Math.PI)) / user.data.length;
         const radius = 105; // Décalage pour le texte
         const x = radius * Math.cos(angle - Math.PI / 2);
         const y = radius * Math.sin(angle - Math.PI / 2);
@@ -112,7 +94,7 @@ export default function Performances() {
           .attr("fill", "white")
       });
     }
-  }, [selection]);
+  }, [selection, user]);
 
   return <svg ref={ref} width={250} height={250} className="performances-svg"></svg>;
 }

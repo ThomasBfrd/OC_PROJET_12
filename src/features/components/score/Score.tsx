@@ -4,9 +4,7 @@ import * as d3 from "d3";
 import variables from "/src/assets/styles/variables.module.scss";
 import "./Score.scss";
 
-const data = [64];
-
-const ArcTween = () => {
+const Score = ({user}: {user: number}) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [selection, setSelection] = useState<null | Selection<
     SVGSVGElement | null,
@@ -53,7 +51,7 @@ const ArcTween = () => {
         .attr("z-index", -2)
         .attr("fill-opacity", 0.5); // Opacité pour le fond intérieur
 
-      const path = g.selectAll<SVGPathElement, number>("path").data([data]);
+      const path = g.selectAll<SVGPathElement, number>("path").data([user]);
       path
         .enter()
         .append("path")
@@ -83,7 +81,7 @@ const ArcTween = () => {
         .attr("text-anchor", "middle") // Centrer le texte
         .attr("font-size", "16px") // Taille de la police
         .attr("class", "percent")
-        .text(`${data[0]}%`);
+        .text(`${user*100}%`);
 
       // Ajout du texte au centre de l'arc
       g.append("text")
@@ -106,4 +104,4 @@ const ArcTween = () => {
   );
 };
 
-export default ArcTween;
+export default Score;
