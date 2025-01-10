@@ -1,17 +1,17 @@
-export interface User {
+export interface UserInfos {
     id: number
-    userInfos: UserInfos
+    userInfos: UserPersonnal
     todayScore: number
     keyData: KeyData
   }
   
-interface UserInfos {
+export interface UserPersonnal {
     firstName: string
     lastName: string
     age: number
   }
   
-interface KeyData {
+export interface KeyData {
     calorieCount: number
     proteinCount: number
     carbohydrateCount: number
