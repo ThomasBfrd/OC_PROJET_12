@@ -1,6 +1,6 @@
 export const getUserInfos = async (type: string) => {
     if(type === 'api') {
-        return fetch('http://localhost:3000/user/12')
+        return fetch('http://localhost:3000/user/18')
         .then((response: Response) => {
             if (!response.ok) {
                 throw (new Error())
@@ -25,7 +25,7 @@ export const getUserInfos = async (type: string) => {
 // Get Activity
 export const getUserActivity = async (type: string) => {
     if(type === 'api') {
-        return fetch('http://localhost:3000/user/12/activity')
+        return fetch('http://localhost:3000/user/18/activity')
         .then((response: Response) => {
             if (!response.ok) {
                 throw (new Error())
@@ -50,7 +50,7 @@ export const getUserActivity = async (type: string) => {
 // Get Average Sessions
 export const getAverageSessions = async (type: string) => {
     if(type === 'api') {
-        return fetch('http://localhost:3000/user/12/average-sessions')
+        return fetch('http://localhost:3000/user/18/average-sessions')
         .then((response: Response) => {
             if (!response.ok) {
                 throw (new Error())
@@ -75,7 +75,7 @@ export const getAverageSessions = async (type: string) => {
 // Get Performances
 export const getPerformances = async (type: string) => {
     if(type === 'api') {
-        return fetch('http://localhost:3000/user/12/performance')
+        return fetch('http://localhost:3000/user/18/performance')
         .then((response: Response) => {
             if (!response.ok) {
                 throw (new Error())
