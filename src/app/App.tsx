@@ -7,14 +7,13 @@ import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppDispatch } from './core/store';
 import { fetchLocalUserInfos, fetchApiUserInfos, fetchLocalUserActivity, fetchLocalUserAverageSessions, fetchLocalUserPerformances, fetchApiUserActivity, fetchApiUserAverageSessions, fetchApiUserPerformances } from './core/userSlice';
-import { selectDataSource, selectStatus, selectUsers } from './core/selectors';
+import { selectDataSource, selectUsers } from './core/selectors';
 
 function App() {
 
   const dispatch: AppDispatch = useDispatch();
   const dataSource = useSelector(selectDataSource);
   const users = useSelector(selectUsers);
-  const status = useSelector(selectStatus);
 
   useEffect(() => {
     if (dataSource === 'local' && !users.localUser.data) {
@@ -29,30 +28,10 @@ function App() {
         dispatch(fetchApiUserPerformances());
     }
 
-    if (status === 'idle') {
-      console.log('Tout premier appel en local');
-    } else if (status === 'loading') {
-      console.log('appel du local ou api');
-    } else if (status === 'failed') {
-      console.log('erreur dans la récupération des données');
-    }
-
-    if (dataSource === 'local') {
-      console.log('données locales');
-      
-    } else if (dataSource === 'api') {
-      console.log('données API');
-      
-    }
-
     return () => {};
 
 
-  }, [dataSource, dispatch, status, users.apiUser, users.localUser]);
-
-  if (status === 'loading') {
-    return <div>Chargement...</div>;
-  }
+  }, [dataSource, dispatch, users.apiUser, users.localUser]);
 
   return (
     <>
