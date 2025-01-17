@@ -8,7 +8,7 @@
     max-width: 120px;
     height: 100%;
     position: fixed;
-    z-index: 1;
+    z-index: 95;
     top: 0;
     left: 0;
 
@@ -60,9 +60,7 @@
         width: 300px;
 
         & .sideNav__legal--text {
-            // transform: rotate(-90deg);
             color: white;
-            // width: 300px;
             font-size: 0.8rem;
         }
     }
