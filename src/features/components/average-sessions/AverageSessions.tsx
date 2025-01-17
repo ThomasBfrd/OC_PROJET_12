@@ -1,156 +1,217 @@
-import React, { useEffect, useRef, useState } from "react";
-import * as d3 from "d3";
-import { Selection } from "d3";
-import { dayTransform, UserAverageSession } from "../../../app/core/interfaces/user-average";
-import './AverageSessions.scss';
+import React, { useRef, useState, useEffect } from 'react';
+import { select, scaleLinear, line, curveCardinal } from 'd3';
+import { Selection } from 'd3-selection';
+import { AverageSession, UserAverageSession } from '../../../app/core/interfaces/user-average';
+
+const dayTransform: {[key: number]: string} = {
+  1 : 'L',
+  2 : 'M',
+  3: 'M',
+  4: 'J',
+  5: 'V',
+  6: 'S',
+  7: 'D',
+}
 
 const AverageSessions = ({user}: {user: UserAverageSession}) => {
   const chartRef = useRef<SVGSVGElement | null>(null);
-
   const [selection, setSelection] = useState<null | Selection<
     SVGSVGElement | null,
     unknown,
     null,
     undefined
   >>(null);
+  const [width, setWidth] = useState<number>(window.innerWidth)
 
+  const firstUserValue = user.sessions[0];
+  const lastUserValue = user.sessions[user.sessions.length - 1];
+  const modifiedUser = {...user};
+  modifiedUser.sessions = [firstUserValue, ...user.sessions, lastUserValue]
+
+  function checkWidth(): void {
+    return window.innerWidth < 1440 ? setWidth(250) : setWidth(300)
+  }
   useEffect(() => {
 
-    // console.log(user);
-    
+    const handleResize = () => {
+      checkWidth();
+    };
+  
+    window.addEventListener("resize", handleResize);
+    checkWidth();
 
-    const data = [
-      { day: "START", sessionLength: user?.sessions[0].sessionLength },
-      ...user?.sessions || [],
-      { day: "END", sessionLength: user?.sessions[user?.sessions.length - 1].sessionLength },
-    ];
+    if (!selection) {
+      setSelection(select(chartRef.current));
+    } else {
+      selection.selectAll("*").remove();
+      const svg = selection;
+      const height = 250;
+      const margin = { top: 40, right: 20, bottom: 40, left: 20 };
 
-    const margin = { top: 20, right: 20, bottom: 40, left: 50 };
-    const width = 250;
-    const height = 250 - margin.top - margin.bottom;
+      const xScale = scaleLinear()
+        .domain([0, modifiedUser.sessions.length - 1])
+        .range([0, width]);
 
-    d3.select(chartRef.current).select("svg").remove();
+      const yScale = scaleLinear()
+        .domain([0, 100])
+        .range([height - margin.bottom, margin.top]);
 
-    const svg = d3
-      .select(chartRef.current)
-      .append("svg")
-      .attr("width", width)
-      .attr("height", height + margin.top + margin.bottom);
+      const lineGenerator = line<AverageSession>()
+        .x((d, i) => xScale(i))
+        .y((d) => yScale(d.sessionLength) - 30)
+        .curve(curveCardinal);
 
-      const highlightArea = svg
-      .append("rect")
-      .attr("width", 0)
-      .attr("height", height + margin.top + margin.bottom)
-      .attr("class", "hightlightArea")
-      .attr("y", 0)
-      .attr("fill", "rgba(0, 0, 0, 0.2)")
-      .style("pointer-events", "none");
+      // Supression des enfants du SVG avant son rechargement
+      svg.selectAll('*').remove();
 
-    const chartArea = svg
-      .append("g")
-      .attr("transform", "translate(0, 20)");
+      // Background foncé au hover, par défaut hidden
+      const overlay = svg
+        .append('rect')
+        .attr('y', 0)
+        .attr('height', height)
+        .attr('fill', 'rgba(0, 0, 0, 0.2)')
+        .attr('visibility', 'hidden');
 
-    const xOriginal = d3
-      .scalePoint()
-      .domain(user?.sessions.map((d) => dayTransform[d.day]))
-      .range([0, width])
-      .padding(0.5);
+      // Courbe
+      svg
+        .append('path')
+        .datum(modifiedUser.sessions)
+        .attr('fill', 'none')
+        .attr('stroke', 'white')
+        .attr('stroke-width', 2)
+        .style('opacity', 0.9)
+        .attr('d', lineGenerator);
 
-    const x = d3
-      .scalePoint()
-      .domain(data.map((d) => d.day))
-      .range([-20, width + 20])
-      .padding(0);
+      // Point blanc
+      const points = svg
+        .selectAll('.point')
+        // On exclu les points fictifs (premier et dernier point)
+        .data(modifiedUser.sessions.slice(1, -1))
+        .enter()
+        .append('circle')
+        .attr('class', 'point')
+        .attr('cx', (d, i) => xScale(i + 1))
+        .attr('cy', (d) => yScale(d.sessionLength) - 30)
+        .attr('r', 5)
+        .attr('fill', 'white')
+        .style('visibility', 'hidden');
 
-    const y = d3.scaleLinear().domain([0, 70]).range([height, 0]);
+      // Cercle transparent arrière
+      const hoverCircle = svg
+        .append('circle')
+        .attr('r', 10)
+        .attr('fill', 'white')
+        .attr('opacity', 0.4)
+        .style('visibility', 'hidden');
 
-    const line = d3
-      .line()
-      .x((d) => x(d.day))
-      .y((d) => y(d.sessionLength))
-      .curve(d3.curveCatmullRom);
+      // Zone hover
+      svg
+        .selectAll('.hover-zone')
+        .data(modifiedUser.sessions.slice(1, -1))
+        .enter()
+        .append('rect')
+        .attr('class', 'hover-zone')
+        .attr('x', (d, i) => (i === 0 ? 0 : xScale(i + 0.5)))
+        .attr('y', 0)
+        .attr('width', (d, i) => (i === 0 ? xScale(1.5) : xScale(i + 1.5) - xScale(i + 0.5)))
+        .attr('height', height)
+        .attr('fill', 'transparent')
+        .on('mousemove', (event, d) => {
+          const [mouseX, mouseY] = [event.offsetX, event.offsetY];
+          const i = modifiedUser.sessions.findIndex((point) => point === d);
 
-    chartArea
-      .append("path")
-      .datum(data)
-      .attr("fill", "none")
-      .attr("stroke", "white")
-      .attr("stroke-width", 2)
-      .attr("transform", `translate(0, -20)`)
-      .attr("d", line);
+          overlay
+            .attr('x', i === 1 ? 0 : xScale(i))
+            .attr('width', i === 1 ? width : width - xScale(i))
+            .attr('visibility', 'visible');
 
-    chartArea
-      .append("g")
-      .attr("transform", `translate(0, ${height})`)
-      .call(
-        d3
-          .axisBottom(xOriginal)
-          .tickSize(0)
-          .tickPadding(10)
-      )
-      .selectAll("text")
-      .style("fill", "white");
+          // Si on dépasse l'index 5, on change la position offset du tooltip
+          const tooltipOffsetX = i >= 5 ? -90 : 10;
 
-    chartArea.select(".domain").remove();
+          tooltip
+            .attr('x', mouseX + tooltipOffsetX)
+            .attr('y', mouseY - 30)
+            .style('visibility', 'visible');
 
-    const focus = chartArea.append("g").style("display", "none");
+          tooltipText
+            .attr('x', mouseX + tooltipOffsetX + 10)
+            .attr('y', mouseY - 5)
+            .text(`${d.sessionLength} min`)
+            .style('visibility', 'visible')
+            .style('font-weight', 'bold')
 
-    focus
-    .append("circle")
-    .attr("r", 10)
-    .attr("fill", "white")
-    .attr("transform", `translate(0, -20)`)
-    .attr("fill", "rgba(255, 255, 255, 0.2)")
-    .attr("stroke-width", 2);
+          points
+            .style('visibility', (point) => (point === d ? 'visible' : 'hidden'));
 
-    focus
-      .append("circle")
-      .attr("r", 5)
-      .attr("fill", "white")
-      .attr("stroke", "white")
-      .attr("transform", `translate(0, -20)`)
-      .attr("stroke-width", 2);
+          hoverCircle
+            .attr('cx', xScale(i === 0 ? i+1 : i))
+            .attr('cy', yScale(d.sessionLength) - 30)
+            .style('visibility', 'visible');
+        })
+        .on('mouseout', () => {
+          tooltip.style('visibility', 'hidden');
+          tooltipText.style('visibility', 'hidden');
+          overlay.attr('visibility', 'hidden');
+          points.style('visibility', 'hidden');
+          hoverCircle.style('visibility', 'hidden');
+        });
 
-    const tooltip = focus
-      .append("text")
-      .attr("text-anchor", "middle")
-      .attr("dy", -10)
-      .style("fill", "white")
-      .attr("transform", `translate(0, -20)`)
-      .style("font-size", "12px");
+      // Tooltip
+      const tooltip = svg
+        .append('rect')
+        .attr('width', 70)
+        .attr('height', 40)
+        .attr('fill', 'white')
+        .style('visibility', 'hidden')
+        .style('pointer-events', 'none');
 
-    chartArea
-      .append("rect")
-      .attr("width", width)
-      .attr("height", height)
-      .style("fill", "none")
-      .style("pointer-events", "all")
-      .on("mouseover", () => focus.style("display", null))
-      .on("mouseout", () => {
-        focus.style("display", "none");
-        highlightArea.attr("width", 0);
-      })
-      .on("mousemove", (event) => {
-        const [mouseX] = d3.pointer(event);
+      const tooltipText = svg
+        .append('text')
+        .attr('fill', 'black')
+        .style('visibility', 'hidden')
+        .style('pointer-events', 'none');
 
-        const closestPoint = user?.sessions.reduce((prev, curr) =>
-          Math.abs(xOriginal(dayTransform[curr.day]) - mouseX) < Math.abs(xOriginal(dayTransform[prev.day]) - mouseX)
-            ? curr
-            : prev
-        );
+      // Titre décomposé
+      svg
+        .append('text')
+        .attr('x', margin.left)
+        .attr('y', margin.top - 10)
+        .attr('fill', 'white')
+        .style('font-size', '16px')
+        .style('opacity', 0.9)
+        .text('Durée moyenne');
 
-        const xPos = xOriginal(dayTransform[closestPoint.day]);
-        const yPos = y(closestPoint.sessionLength);
+      svg
+        .append('text')
+        .attr('x', margin.left)
+        .attr('y', margin.top + 10)
+        .attr('fill', 'white')
+        .style('font-size', '16px')
+        .style('opacity', 0.9)
+        .text('des sessions');
 
-        focus.attr("transform", `translate(${xPos},${yPos})`);
-        tooltip.text(`${closestPoint.sessionLength} min`);
+      // Légendes sur l'axe X
+      svg
+        .selectAll('.x-axis-label')
+        // On ignore les points fictifs (premier et dernier point)
+        .data(modifiedUser.sessions.slice(1, -1))
+        .enter()
+        .append('text')
+        .attr('class', 'x-axis-label')
+        .attr('x', (d, i) => xScale(i + 1))
+        .attr('y', height - margin.bottom + 20)
+        .attr('fill', 'white')
+        .style('text-anchor', 'middle')
+        .style('font-size', '12px')
+        .style('opacity', 0.9)
+        .text((d) => dayTransform[d.day]);
 
-        const highlightX = xPos - xOriginal.step() / 2;
-        highlightArea.attr("x", highlightX).attr("width", width - highlightX);
-      });
-  }, [user]);
+    }
 
-  return <div ref={chartRef} width={250} height={250}></div>;
+    return () => {}
+  }, [selection, width, user, modifiedUser.sessions]);
+
+  return <svg ref={chartRef} height={250} width={width}></svg>;
 };
 
 export default AverageSessions;
