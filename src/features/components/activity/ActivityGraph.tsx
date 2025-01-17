@@ -17,7 +17,7 @@ export default function ActivityGraph({user}: {user: UserActivity | null}) {
     null,
     undefined
   >>(null);
-  const [width, setWidth] = useState<number>(document.body.clientWidth)
+  const [width, setWidth] = useState<number>(250)
 
   const kg = user?.sessions.map((element) => element.kilogram) || [];
   const minKg = Math.min(...kg) - 3;
@@ -31,9 +31,7 @@ export default function ActivityGraph({user}: {user: UserActivity | null}) {
   };
 
   useEffect(() => {
-    console.log(user);
-    
-    // const svgWidth = 600;
+
     const svgWidth = width;
     const svgHeight = 200;
     const barWidth = 15;
@@ -252,7 +250,7 @@ export default function ActivityGraph({user}: {user: UserActivity | null}) {
     }
 
     return () => window.removeEventListener("resize", handleResize);
-  }, [selection, width, user]);
+  }, [selection, width, user, minKg, maxKg, maxCalories]);
   return (
     <div className="bars-chart" style={{ paddingTop: "100px" }}>
       {/* Création du SVG avec ses dimensions permettant son affichage dans le DOM */}
