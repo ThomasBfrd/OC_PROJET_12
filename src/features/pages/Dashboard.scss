@@ -2,27 +2,48 @@
 @use '/src/assets/styles/queries.scss';
 
 .dashboard {
-	// width: 100%;
 	height: 100%;
-	padding: 100px 80px 0 80px;
-	// max-width: 1440px;
-	// margin: 0 auto;
+	padding: 80px 80px 0 80px;
 	margin-left: 80px;
+	overflow: hidden;
 }
 
+.dashboard-background {
+	left:0;
+	top: 0;
+	background-color: white;
+	opacity: 0.8;
+	position: absolute;
+	height: 100dvh;
+	width: 100dvw;
+	z-index: 2;
+}
+
+.loading {
+	z-index: 10;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 50px;
+	aspect-ratio: 1;
+	border-radius: 50%;
+	padding: 3px;
+	background: 
+	  radial-gradient(farthest-side,$red 95%,#0000) 50% 0/12px 12px no-repeat,
+	  radial-gradient(farthest-side,#0000 calc(100% - 5px),$red calc(100% - 4px)) content-box;
+	animation: l6 2s infinite ;
+  }
+  @keyframes l6 {to{transform: rotate(1turn)}
+}
+  
+
 .ladderboard {
-	// width: 100%;
 	height: 100%;
-	// height: 550px;
 	
 	position: relative;
 	display: grid;
-	// grid-template-columns: repeat(10, 1fr);
-	// grid-template-rows: repeat(10, 1fr);
-	grid-column-gap: 0px;
-	grid-row-gap: 0px;
-	align-items: center;
-	// border: solid 2px blue;
+	grid-column-gap: 20px;
+	justify-content: space-between;
 
 	& .cards {
 		grid-area: 1 / 9 / 11 / 11;
@@ -30,14 +51,12 @@
 		flex-direction: column;
 		justify-content: space-between;
 		height: 100%;
-		width: 100%;
+		// width: 100%;
 		padding: 0;
 		margin: 0 0 0 20px;
 
 		& .card-list {
-			// position: relative;
 			list-style: none;
-			// max-height: 600px;
 			height: 100%;
 			display: flex;
 			flex-direction: column;
@@ -56,22 +75,19 @@
 	
 	& .activity {
 		grid-area: 4 / 1 / 7 / 9;
-		// height: 250px;
-		width: 100%;
-		// margin-bottom: 70px;
 		background-color: $lightbackground;
-		// background-color: red;
 		display: flex;
 	  justify-content: center;
 	  align-items: center;
 	  border-radius: 8px;
-	  margin-bottom: 15px;
+	  margin-bottom: 30px;
 	}
 	
 	& .average-sessions {
 		grid-area: 7 / 1 / 11 / 4;
 		height: 250px;
-		// width: 250px;
+		// width: 100%;
+		max-width: 300px;
 		background-color: $red;
 		border-radius: 8px;
 		// border: solid 2px blue;
@@ -84,20 +100,21 @@
 		grid-area: 7 / 4 / 11 / 7;
 		background-color: $darkgrey;
 		height: 250px;
-		// width: 250px;
+		max-width: 300px;
 		border-radius: 8px;
 		// border: solid 2px blue;
-		margin: 0 15px 0 15px;
+		// margin: 0 15px 0 15px;
 		display: flex;
 		justify-content: center;
 		align-items: center;
+
 	}
 	
 	& .score {
 		grid-area: 7 / 7 / 11 / 9;
 		background-color: $lightbackground;
 		height: 250px;
-		// width: 250px;
+		max-width: 300px;
 		border-radius: 8px;
 		// border: solid 2px blue;
 		display: flex;
@@ -110,15 +127,13 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	// margin-bottom: 30px;
 	// border: solid 2px blue;
 
 	.resume {
 		flex: 1;
 		grid-area: 1 / 1 / 4 / 9;
-		margin-bottom: 30px;
+		margin-bottom: 0px;
 		text-align: start;
-		// height: 150px;
 	
 		& .infos {
 			margin-right: 20px;
@@ -129,6 +144,7 @@
 	
 			& .name {
 				color: $red;
+				margin-left: 10px;
 			}
 		}
 	}
@@ -139,8 +155,10 @@
 		flex-direction: row;
 		justify-content: flex-end;
 		align-items: center;
-		margin-bottom: 80px;
+		margin-bottom: 50px;
 		gap: 2%;
+		padding-top: 50px;
+		margin-right: 20px;
 	}
 }
 
@@ -184,18 +202,21 @@ input:checked+label:after {
 
 
 @media screen and (max-width: 1440px) {
+	.dashboard {
+		position: relative;
+		height: 100%;
+		padding: 100px 20px 0 80px;
+		margin-left: 50px;
+		overflow: hidden;
+	}
+
     .ladderboard {
         
         position: relative;
         display: grid;
-        // grid-template-columns: repeat(10, 1fr);
-        // grid-template-rows: repeat(10, 1fr);
         grid-column-gap: 0px;
         grid-row-gap: 0px;
-        align-items: center;
-		justify-items: center;
 		justify-content: space-between;
-        // border: solid 2px blue;
 		width: 100%;
     
         & .cards {
@@ -203,76 +224,69 @@ input:checked+label:after {
             display: flex;
             flex-direction: row;
             justify-content: space-between;
-            height: 100%;
-            width: 100%;
-            padding: 0;
             margin: 0 0 15px 0;
     
             & .card-list {
-                // position: relative;
-                list-style: none;
-                // max-height: 600px;
-                height: 100%;
-				width: 100%;
                 display: flex;
                 flex-direction: row;
                 align-items: center;
                 justify-content: space-between;
                 padding: 0;
                 margin: 0;
-    
-            
-                & .card-item {
-                    border-radius: 15px;
-                    margin: 0;
-                }
             }
         }
         
         & .activity {
             grid-area: 4 / 1 / 7 / 12;
             height: 350px;
-            width: 100%;
-            // margin-bottom: 70px;
-            background-color: $lightbackground;
-            // background-color: red;
-            display: flex;
-          justify-content: center;
-          align-items: center;
-          border-radius: 8px;
         }
         
         & .average-sessions {
             grid-area: 7 / 1 / 11 / 4;
-            height: 250px;
-            width: 100%;
-            background-color: $red;
-            border-radius: 8px;
-			display: flex;
-			justify-content: center;
-			align-items: center;
+			max-width: 300px;
+			min-width: 250px;
         }
         
         & .performances {
             grid-area: 7 / 5 / 11 / 8;
-            background-color: $darkgrey;
-            height: 250px;
-            width: 100%;
-            border-radius: 8px;
-			display: flex;
-			justify-content: center;
-			align-items: center;
         }
         
         & .score {
             grid-area: 7 / 9 / 11 / 12;
-            background-color: $lightbackground;
-            height: 250px;
-            width: 100%;
-            border-radius: 8px;
-			display: flex;
-			justify-content: center;
-			align-items: center;
         }
     }
+
+	.dashboard__header {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 100%;
+		// border: solid 2px blue;
+	
+		.resume {
+			flex: 1;
+			grid-area: 1 / 1 / 4 / 9;
+			margin-bottom: 0px;
+		
+			& .infos {
+				margin-right: 20px;
+				display: flex;
+				justify-content: start;
+				align-items: center;
+				line-height: 0;
+		
+				& .name {
+					color: $red;
+					margin-left: 10px;
+				}
+			}
+		}
+	
+		& .switch {
+			flex: 0.5;
+			display: flex;
+			padding-top: 30px;
+			margin-right: 20px;
+		}
+	}
 }
