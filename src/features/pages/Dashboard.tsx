@@ -21,28 +21,27 @@ export default function Dashboard() {
 
   useEffect(() => {
     const getUserFromStore = () => {
-      const user = dataSource === 'local' ? users.localUser : users.apiUser;
+      const user = dataSource === 'local' ? users.localAllData : users.apiAllData;
       
-      if (user) {
-        const { data, activity, averageSession, performances } = user;
-        if (data && activity && averageSession && performances) {
-          setUserFromStore({
-            userInfos: data,
-            userActivity: activity,
-            userPerformances: performances,
-            userAverage: averageSession
-          });
-        }
+      if (user && user.data && user.activity && user.averageSession && user.performances) {
+        setUserFromStore({
+          userAverage: Array.isArray(user.averageSession) ? user.averageSession : [user.averageSession],
+          userActivity: Array.isArray(user.activity) ? user.activity : [user.activity],
+          userPerformances: Array.isArray(user.performances) ? user.performances : [user.performances],
+          data: Array.isArray(user.data) ? user.data : [user.data],
+        });
+        console.log(user);
       }
     };
     getUserFromStore();
+    
 
     if (status === 'failed') {
       setIsChecked(false);
     }
 
     return () => {};
-  }, [dataSource, dispatch, users.apiUser, users.localUser, status, setIsChecked]);
+  }, [dataSource, dispatch, users.apiAllData, status, setIsChecked, users.localAllData]);
 
   const handleSwitch = () => {
     setIsChecked(!isChecked);
@@ -59,7 +58,7 @@ export default function Dashboard() {
               <h1>
                 Bonjour 
                 <span className="name"> 
-                  {userFromStore.userInfos.userInfos.firstName}
+                  {userFromStore.data[0].userInfos.firstName}
                 </span>
               </h1>
             </div>
@@ -73,19 +72,19 @@ export default function Dashboard() {
         </div>
         <div className="ladderboard">
           <div className="cards">
-            <Card userKeyData={userFromStore.userInfos.keyData} />
+            <Card userKeyData={userFromStore.data[0].keyData} />
           </div>
           <div className="activity">
-            <ActivityGraph user={userFromStore.userActivity} />
+            <ActivityGraph user={userFromStore.userActivity[0]} />
           </div>
           <div className="average-sessions">
-            <AverageSessions user={userFromStore.userAverage}/>
+            <AverageSessions user={userFromStore.userAverage[0]}/>
           </div>
           <div className="performances">
-            <Performances user={userFromStore.userPerformances} />
+            <Performances user={userFromStore.userPerformances[0]} />
           </div>
           <div className="score">
-            <Score user={userFromStore.userInfos.todayScore} />
+            <Score user={userFromStore.data[0].todayScore} />
           </div>
         </div>
       </>) : null}
