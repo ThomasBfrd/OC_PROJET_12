@@ -1,8 +1,8 @@
 import { Store } from 'redux';
-import { UserPersonnal } from './interfaces/user-infos.interface';
+import { UserState } from './interfaces/user-state-interface';
 
 export interface RootState {
-  users: UserPersonnal[];
+  users: UserState;
 }
 
 export type StoreState = ReturnType<Store['getState']>;
