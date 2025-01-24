@@ -3,12 +3,6 @@ import { getAllUserData } from "../../Api/Api";
 import { UserState } from "./interfaces/user-state-interface";
 
 const initialState: UserState = {
-  localUser: {
-    data: null,
-    activity: null,
-    performances: null,
-    averageSession: null,
-  },
   localAllData: {
     data: null,
     activity: null,
@@ -21,14 +15,9 @@ const initialState: UserState = {
     performances: null,
     averageSession: null,
   },
-  apiUser: {
-    data: null,
-    activity: null,
-    performances: null,
-    averageSession: null,
-  },
   dataSource: "local",
   status: "idle",
+  userId: '12'
 };
 
 // Requête LOCALE - ALL DATA
@@ -36,7 +25,7 @@ export const fetchLocalUserAllData = createAsyncThunk(
   "user/fetchLocalUserAllData",
   async () => {
     const response = await getAllUserData("local");
-    console.log(response);
+    
     if (response) {
       return {
         data: response[0],
@@ -51,9 +40,8 @@ export const fetchLocalUserAllData = createAsyncThunk(
 // Requête API - ALL DATA
 export const fetchApiUserAllData = createAsyncThunk(
   "user/fetchApiUserAllData",
-  async () => {
-    const response = await getAllUserData("api");
-    console.log(response);
+  async (userId: string) => {
+    const response = await getAllUserData("api", userId);
     if (response) {
       return {
         data: response[0],
@@ -61,6 +49,9 @@ export const fetchApiUserAllData = createAsyncThunk(
         performances: response[2],
         averageSession: response[3],
       };
+    } else {
+      throw new Error("Erreur dans la récupération de données");
+      
     }
   }
 );
