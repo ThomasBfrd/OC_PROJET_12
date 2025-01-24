@@ -25,29 +25,34 @@ export default function ActivityGraph({user}: {user: UserActivity | null}) {
   const calories = user?.sessions.map((element) => element.calories) || [];
   const maxCalories = Math.max(...calories) + 30;
 
-  function checkWidth()  {
-
-    return window.innerWidth > 1440 ? setWidth(650) : setWidth(750);
-  };
-
   useEffect(() => {
-
-    const svgWidth = width;
     const svgHeight = 200;
     const barWidth = 15;
     const padding = 10;
 
+    function calculateWidth(innerWidth: number): number {
+      if (innerWidth > 1440) {
+        return 900;
+      } else if (innerWidth <= 1440 && innerWidth > 1024) {
+        return 1100 - ((1100 - 800) * (1440 - innerWidth)) / (1440 - 1024);
+      } else {
+        return 800;
+      }
+    }
+    
     const handleResize = () => {
-      checkWidth();
+      const newWidth = calculateWidth(window.innerWidth);
+      setWidth(newWidth);
+      selection?.attr("width", newWidth);
     };
   
     window.addEventListener("resize", handleResize);
-    checkWidth();
+    handleResize();
 
     // Etendue des valeurs sur l'axe X
     const xScale = scaleBand()
-      .domain(user?.sessions.map((_, i) => `${i + 1}`) as string[] || [])
-      .range([0, svgWidth])
+      .domain(user?.sessions.map((_, i) => `${i + 1}`) || [])
+      .range([0, width])
       .align(0.5)
       .padding(1);
 
@@ -68,24 +73,28 @@ export default function ActivityGraph({user}: {user: UserActivity | null}) {
       setSelection(select(ref.current));
     } else {
 
+      selection.selectAll("*").remove();
+
       // REPERE HORIZONTAUX
       selection
         .selectAll("line.grid")
         .data(tickValuesKg)
         .join("line")
         .attr("class", "grid")
-        .attr("x1", "0")
-        .attr("x2", svgWidth - padding)
+        .attr("x1", 0)
+        .attr("x2", width - (padding * 10))
         .attr("y1", (d) => yScaleKilogram(d))
         .attr("y2", (d) => yScaleKilogram(d))
         .attr("stroke", variables.lightgrey)
-        .attr("stroke-dasharray", "5,5");
+        .attr("stroke-dasharray", "5,5")
+        .attr("transform", "translate(50, 0)")
 
       // TOOLTIP
       // Création du tooltip dans le DOM
       const tooltip = document.createElement("div");
       tooltip.classList.add("tooltip");
-      document.body.appendChild(tooltip);
+      const svgInDom = document.querySelector('.bars-chart');
+      svgInDom?.appendChild(tooltip);
 
       // GROUPBAR : Création des barres
       const barGroups = selection
@@ -182,8 +191,8 @@ export default function ActivityGraph({user}: {user: UserActivity | null}) {
         })
         // Position dynamique du tooltip
         .on("mousemove", function (event) {
-          tooltip.style.top = event.pageY - 90 + "px";
-          tooltip.style.left = event.pageX + 15 + "px";
+          tooltip.style.top = event.pageY - 300 + "px";
+          tooltip.style.left = event.pageX - 120 + "px";
         });
 
       // Titre du graphique
@@ -191,7 +200,8 @@ export default function ActivityGraph({user}: {user: UserActivity | null}) {
         .selectAll("text.title")
         .data([null])
         .join("text")
-        .attr("x", 15)
+        .attr("x", (width / legends.length) / 4)
+        .attr("text-anchor", "middle")
         .attr("y", -50)
         .attr("font-size", "16px")
         .attr("font-weight", "600")
@@ -203,7 +213,7 @@ export default function ActivityGraph({user}: {user: UserActivity | null}) {
         .data(user?.sessions.map((_, i) => `${i + 1}`) || [])
         .join("text")
         .attr("class", "x-axis")
-        .attr("x", (d) => xScale(d)! + xScale.bandwidth() / 2)
+        .attr("x", (d) => xScale(d)!)
         .attr("y", svgHeight + 25)
         .attr("text-anchor", "middle")
         .attr("font-weight", "800")
@@ -217,7 +227,7 @@ export default function ActivityGraph({user}: {user: UserActivity | null}) {
         .data(tickValuesKg)
         .join("text")
         .attr("class", "y-axis")
-        .attr("x", () => svgWidth + 10)
+        .attr("x", () => width - 10)
         .attr("y", (d) => yScaleKilogram(d) + 4)
         .attr("text-anchor", "middle")
         .attr("font-weight", "800")
@@ -231,7 +241,7 @@ export default function ActivityGraph({user}: {user: UserActivity | null}) {
         .data(legends)
         .join("g")
         .attr("class", "legend")
-        .attr("transform", (_, i) => `translate(${i * 100 + 350}, -50)`)
+        .attr("transform", (_, i) => `translate(${(width / legends.length) + (i * 100) + 160}, -50)`)
 
         // Création de des légendes selon les data legends injectées
         .call((g) => {
@@ -256,7 +266,7 @@ export default function ActivityGraph({user}: {user: UserActivity | null}) {
       {/* Création du SVG avec ses dimensions permettant son affichage dans le DOM */}
       <svg
         ref={ref}
-        width={window.innerWidth > 1440 ? 700 : 800}
+        width={width}
         height={250}
         style={{ overflow: "visible" }}
       ></svg>
