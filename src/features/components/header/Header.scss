@@ -30,6 +30,10 @@
             display: flex;
             justify-content: space-around;
 
+            & .link {
+                text-decoration: none;
+            }
+
             & .header__menu-nav-url {
                 color: white;
                 font-weight: bold;
