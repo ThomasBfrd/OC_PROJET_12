@@ -1,16 +1,16 @@
 import './App.css'
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Dashboard from '../features/pages/Dashboard';
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import Dashboard from "../features/pages/dashboard/Dashboard";
 import Header from '../features/components/header/Header';
 import Aside from '../features/components/aside/Aside';
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppDispatch } from './core/store';
 import {
-  fetchLocalUserAllData,
-  fetchApiUserAllData,
+  fetchLocalUserAllData
 } from "./core/userSlice";
 import { selectDataSource, selectUsers } from './core/selectors';
+import Home from '../features/pages/home/Home';
 
 function App() {
 
@@ -21,31 +21,33 @@ function App() {
   useEffect(() => {
     if (dataSource === "local" && !users.localAllData.data) {
       dispatch(fetchLocalUserAllData());
-    } else if (dataSource === "api" && !users.apiAllData.data) {
-      dispatch(fetchApiUserAllData());
     }
 
-    console.log(users.localAllData);
 
     return () => {};
   }, [
     dataSource,
     dispatch,
-    users.localAllData,
-    users.apiAllData
+    users.localAllData
   ]);
 
   return (
     <>
-    <BrowserRouter>
-    <Header />
-    <Routes>
-      <Route path='/' element={<Dashboard />}></Route>
-    </Routes>
-    <Aside />
-    </BrowserRouter>
+      <BrowserRouter>
+        <Header />
+        <Routes>
+          <Route path="/" element={<Home />}></Route>
+          <Route path="/dashboard" element={<Dashboard />}></Route>
+          <Route path="/dashboard/:userId" element={<Dashboard />}></Route>
+          <Route
+            path="*"
+            element={<Navigate to="/"></Navigate>}
+          ></Route>
+        </Routes>
+        <Aside />
+      </BrowserRouter>
     </>
-  )
+  );
 }
 
 export default App
