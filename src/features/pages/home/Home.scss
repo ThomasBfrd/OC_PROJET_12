@@ -1,0 +1,60 @@
+.home {
+	height: 85dvh;
+	padding: 80px 80px 0 80px;
+	margin-left: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    &__welcome {
+        width: 100%;
+        text-align: center;
+        text-wrap: balance;
+        font-size: 2rem;
+        margin-bottom: 30px;
+    }
+
+    &__button__list {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 30px;
+        width: 50%;
+
+        & .link {
+            text-decoration: none;
+        }
+    }
+
+    &__button {
+        position: relative;
+        background-color: black;
+        height: 90px;
+        width: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 11px;
+        cursor: pointer;
+
+        &::after {
+            content: '';
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            border-radius: 15px;
+            border: 0px  red solid;
+            transition: border 0.15s ease-in-out;
+        }
+
+        &:hover::after {
+            border: 4px  red solid;
+        }
+        
+        &--text {
+            color: white;
+            font-weight: bold;
+        }
+    }
+}
