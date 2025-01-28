@@ -5,7 +5,63 @@
 	height: 100%;
 	padding: 80px 80px 0 80px;
 	margin-left: 80px;
-	overflow: hidden;
+	position: relative;
+
+	& .error__toast {
+		z-index: 50;
+		position: absolute;
+		// right: -300px;
+		bottom: 120px;
+		width: 280px;
+		height: 80px;
+		background-color: red;
+		opacity: 0.9;
+		border-radius: 8px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		animation: error-toast 0.4s forwards cubic-bezier(.36,.48,.35,1.04);
+		animation: error-toast-disparition 0.8s 3s forwards cubic-bezier(.36,.48,.35,1.04);
+		
+		&-text {
+			padding: 15px;
+			color: white;
+			font-weight: normal;
+			text-wrap: balance;
+		}
+	}
+	
+	& .disparition {
+		right: 0;
+		bottom: 0;
+		animation: error-toast-disparition 0.8s 3s forwards cubic-bezier(.36,.48,.35,1.04);
+	}
+
+	.error-message {
+		position: absolute;
+		top: 50dvh;
+		left: 30dvw;
+	}
+}
+
+@keyframes error-toast {
+	from {
+		right: -300px;
+	}
+
+	to {
+		right: 20px;
+	}
+}
+
+@keyframes error-toast-disparition {
+	from {
+		opacity: 0.9;
+	}
+
+	to {
+		opacity: 0;
+	}
 }
 
 .dashboard-background {
@@ -50,7 +106,6 @@
 		flex-direction: column;
 		justify-content: space-between;
 		height: 100%;
-		// width: 100%;
 		padding: 0;
 		margin: 0 0 0 20px;
 
@@ -81,52 +136,55 @@
 	  border-radius: 8px;
 	  margin-bottom: 30px;
 	}
-	
-	& .average-sessions {
-		grid-area: 7 / 1 / 11 / 4;
-		height: 250px;
-		// width: 100%;
-		max-width: 300px;
-		background-color: $red;
-		border-radius: 8px;
-		// border: solid 2px blue;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-	
-	& .performances {
-		grid-area: 7 / 4 / 11 / 7;
-		background-color: $darkgrey;
-		height: 250px;
-		max-width: 300px;
-		border-radius: 8px;
-		// border: solid 2px blue;
-		// margin: 0 15px 0 15px;
-		display: flex;
-		justify-content: center;
-		align-items: center;
 
+	& .graphic-squares {
+		grid-area: 7 / 1 / 11 / 9;
+		display: flex;
+		justify-content: space-between;
+		gap: 15px;
+
+		& .average-sessions {
+			grid-area: 7 / 1 / 11 / 4;
+			height: 250px;
+			// width: 100%;
+			max-width: 300px;
+			background-color: $red;
+			border-radius: 8px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+		
+		& .performances {
+			grid-area: 7 / 4 / 11 / 7;
+			background-color: $darkgrey;
+			height: 250px;
+			max-width: 300px;
+			border-radius: 8px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+	
+		}
+		
+		& .score {
+			grid-area: 7 / 7 / 11 / 9;
+			background-color: $lightbackground;
+			height: 250px;
+			max-width: 300px;
+			border-radius: 8px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
 	}
 	
-	& .score {
-		grid-area: 7 / 7 / 11 / 9;
-		background-color: $lightbackground;
-		height: 250px;
-		max-width: 300px;
-		border-radius: 8px;
-		// border: solid 2px blue;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
 }
 
 .dashboard__header {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	// border: solid 2px blue;
 
 	.resume {
 		flex: 1;
@@ -144,6 +202,13 @@
 			& .name {
 				color: $red;
 				margin-left: 10px;
+
+				& .datasource {
+					font-size: 0.9rem;
+					margin-left: 10px;
+					font-weight: normal;
+					color: black;
+				}
 			}
 		}
 	}
@@ -202,12 +267,15 @@ input:checked+label:after {
 
 @media screen and (max-width: 1440px) {
 	.dashboard {
-		position: relative;
-		height: 100%;
 		padding: 100px 20px 0 80px;
-		margin-left: 50px;
-		overflow: hidden;
+		margin-left: 80px;
+		// overflow: hidden;
 	}
+
+	// height: 100%;
+	// padding: 80px 80px 0 80px;
+	// margin-left: 80px;
+	// position: relative;
 
     .ladderboard {
         
@@ -239,20 +307,14 @@ input:checked+label:after {
             grid-area: 4 / 1 / 7 / 12;
             height: 350px;
         }
+
+		& .graphic-squares {
+			grid-area: 7 / 1 / 11 / 12;
+			display: flex;
+			justify-content: center;
+			gap: 40px;
+		}
         
-        & .average-sessions {
-            grid-area: 7 / 1 / 11 / 4;
-			max-width: 300px;
-			min-width: 250px;
-        }
-        
-        & .performances {
-            grid-area: 7 / 5 / 11 / 8;
-        }
-        
-        & .score {
-            grid-area: 7 / 9 / 11 / 12;
-        }
     }
 
 	.dashboard__header {
@@ -260,7 +322,6 @@ input:checked+label:after {
 		justify-content: center;
 		align-items: center;
 		width: 100%;
-		// border: solid 2px blue;
 	
 		.resume {
 			flex: 1;

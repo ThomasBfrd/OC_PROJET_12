@@ -19,7 +19,7 @@ export const getAllUserData = async (type: string, userId?: string) => {
             return res;
         }
         catch {
-            return null;
+            throw new Error();
         }
     } else if (type === 'local') {
         try {
@@ -41,7 +41,7 @@ export const getAllUserData = async (type: string, userId?: string) => {
             return res;
         }
         catch {
-            return null;
+            throw new Error();
         }
     }
 }

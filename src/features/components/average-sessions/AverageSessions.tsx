@@ -69,7 +69,7 @@ const AverageSessions = ({user}: {user: UserAverageSession}) => {
         .append('rect')
         .attr('y', 0)
         .attr('height', height)
-        .attr('fill', 'rgba(0, 0, 0, 0.2)')
+        .attr('fill', 'rgba(0, 0, 0, 0.1)')
         .attr('visibility', 'hidden');
 
       // Courbe
@@ -85,7 +85,7 @@ const AverageSessions = ({user}: {user: UserAverageSession}) => {
       // Point blanc
       const points = svg
         .selectAll('.point')
-        // On exclu les points fictifs (premier et dernier point)
+        // On exclue les points fictifs (premier et dernier point)
         .data(modifiedUser.sessions.slice(1, -1))
         .enter()
         .append('circle')
@@ -198,7 +198,7 @@ const AverageSessions = ({user}: {user: UserAverageSession}) => {
         .enter()
         .append('text')
         .attr('class', 'x-axis-label')
-        .attr('x', (d, i) => xScale(i + 1))
+        .attr('x', (_, i) => xScale(i + 1))
         .attr('y', height - margin.bottom + 20)
         .attr('fill', 'white')
         .style('text-anchor', 'middle')
