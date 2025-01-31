@@ -34,9 +34,9 @@ export default function ActivityGraph({user}: {user: UserActivity | null}) {
       if (innerWidth > 1440) {
         return 900;
       } else if (innerWidth <= 1440 && innerWidth > 1024) {
-        return 1100 - ((1100 - 800) * (1440 - innerWidth)) / (1440 - 1024);
+        return 1100 - ((1100 - 750) * (1440 - innerWidth)) / (1440 - 1024);
       } else {
-        return 800;
+        return 750;
       }
     }
     
@@ -116,7 +116,6 @@ export default function ActivityGraph({user}: {user: UserActivity | null}) {
         })
         // Ajout des rectangles pour le background
         .call((g) => {
-          // console.log("ajout des rectangles background");
           g.selectAll("rect.background")
             .data([null])
             .join("rect")

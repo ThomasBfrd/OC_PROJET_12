@@ -72,7 +72,6 @@ const userSlice = createSlice({
       })
       .addCase(fetchLocalUserAllData.fulfilled, (state, action) => {
         state.status = "succeeded";
-        // console.log(action.payload);
 
         if (action.payload) {
           state.localAllData = action.payload;
@@ -96,7 +95,6 @@ const userSlice = createSlice({
             performances: action.payload.performances.data,
             averageSession: action.payload.averageSession.data,
           };
-          console.log(state.apiAllData);
         }
       })
       .addCase(fetchApiUserAllData.rejected, (state) => {

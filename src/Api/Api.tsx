@@ -14,7 +14,6 @@ export const getAllUserData = async (type: string, userId?: string) => {
             }
 
             const res = await Promise.all(data.map(response => response.json()));
-            console.log(res);
 
             return res;
         }
@@ -36,7 +35,6 @@ export const getAllUserData = async (type: string, userId?: string) => {
             }
 
             const res = await Promise.all(data.map(response => response.json()));
-            console.log(res);
 
             return res;
         }
