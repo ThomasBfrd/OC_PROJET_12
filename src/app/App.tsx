@@ -1,16 +1,16 @@
 import './App.css'
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import Dashboard from "../features/pages/dashboard/Dashboard";
-import Header from '../features/components/header/Header';
-import Aside from '../features/components/aside/Aside';
+import Dashboard from "./features/pages/dashboard/Dashboard";
+import Header from "./features/components/header/Header";
+import Aside from "./features/components/aside/Aside";
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { AppDispatch } from './core/store';
 import {
   fetchLocalUserAllData
 } from "./core/userSlice";
 import { selectDataSource, selectUsers } from './core/selectors';
-import Home from '../features/pages/home/Home';
+import Home from "./features/pages/home/Home";
+import { AppDispatch } from './core/types/store-types';
 
 function App() {
 
