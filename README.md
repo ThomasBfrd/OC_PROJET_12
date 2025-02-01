@@ -20,7 +20,7 @@ Objectif :
 - Faire des requêtes API avec Fetch ou Axios pour récupérer les informations nécessaires.
 
 ## Contexte
-SportSee est une plateform de coaching sportif. <br />
+SportSee est une plateforme de coaching sportif. <br />
 L'objectif est de créer une page profil pour un tableau de bord d’analytics dédié au coaching sportif.
 
 ## Installation
