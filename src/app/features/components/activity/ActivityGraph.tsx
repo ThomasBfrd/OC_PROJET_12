@@ -1,0 +1,280 @@
+import { scaleBand, scaleLinear, select, Selection } from "d3";
+import { useEffect, useRef, useState } from "react";
+import "./ActivityGraph.scss";
+import variables from "/src/assets/styles/variables.module.scss";
+import { UserActivity } from "../../../core/interfaces/user-activity";
+
+const legends = [
+  { color: variables.darkgrey, text: "Poids (kg)" },
+  { color: variables.red, text: "Calories brûlées (kCal)" },
+];
+
+export default function ActivityGraph({ user }: { user: UserActivity | null }) {
+  const ref = useRef<SVGSVGElement | null>(null);
+  const [selection, setSelection] = useState<null | Selection<
+    SVGSVGElement | null,
+    unknown,
+    null,
+    undefined
+  >>(null);
+  const [width, setWidth] = useState<number>(250);
+
+  const kg = user?.sessions.map((element) => element.kilogram) || [];
+  const minKg = Math.min(...kg) - 3;
+  const maxKg = Math.max(...kg) + 3;
+  const calories = user?.sessions.map((element) => element.calories) || [];
+  const maxCalories = Math.max(...calories) + 30;
+
+  useEffect(() => {
+    const svgHeight = 200;
+    const barWidth = 15;
+    const padding = 10;
+
+    function calculateWidth(innerWidth: number): number {
+      if (innerWidth > 1440) {
+        return 900;
+      } else if (innerWidth <= 1440 && innerWidth > 1024) {
+        return 1100 - ((1100 - 750) * (1440 - innerWidth)) / (1440 - 1024);
+      } else {
+        return 750;
+      }
+    }
+
+    const handleResize = () => {
+      const newWidth = calculateWidth(window.innerWidth);
+      setWidth(newWidth);
+      selection?.attr("width", newWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+    handleResize();
+
+    // Etendue des valeurs sur l'axe X
+    const xScale = scaleBand()
+      .domain(user?.sessions.map((_, i) => `${i + 1}`) || [])
+      .range([0, width])
+      .align(0.5)
+      .padding(1);
+
+    // Etendue des valeurs sur l'axe Y pour les données Kg
+    const yScaleKilogram = scaleLinear()
+      .domain([minKg, maxKg])
+      .range([svgHeight, 0]);
+
+    // Etendue des valeurs sur l'axe Y pour les données kCal
+    const yScaleCalories = scaleLinear()
+      .domain([0, maxCalories])
+      .range([svgHeight, 0]);
+
+    // Généralisation des repères horizontaux en pointillés, déterminant leur position en calculant la médiane des valeurs reçues
+    const tickValuesKg = [minKg, (minKg + maxKg) / 2, maxKg];
+
+    if (!selection) {
+      setSelection(select(ref.current));
+    } else {
+      selection.selectAll("*").remove();
+
+      // REPERE HORIZONTAUX
+      selection
+        .selectAll("line.grid")
+        .data(tickValuesKg)
+        .join("line")
+        .attr("class", "grid")
+        .attr("x1", 0)
+        .attr("x2", width - padding * 10)
+        .attr("y1", (d) => yScaleKilogram(d))
+        .attr("y2", (d) => yScaleKilogram(d))
+        .attr("stroke", variables.lightgrey)
+        .attr("stroke-dasharray", "5,5")
+        .attr("transform", "translate(50, 0)");
+
+      // TOOLTIP
+      // Création du tooltip dans le DOM
+      const tooltip = document.createElement("div");
+      tooltip.classList.add("tooltip");
+      const svgInDom = document.querySelector(".bars-chart");
+      svgInDom?.appendChild(tooltip);
+
+      // GROUPBAR : Création des barres
+      const barGroups = selection
+        .selectAll("g.bar-group")
+        .data(user?.sessions || [])
+        .join("g")
+        .attr("class", "bar-group")
+        .attr("transform", (_, i) => `translate(${xScale(`${i + 1}`)!}, 0)`)
+        // Hover sur les rectangles liés aux groupes, permettant de changer le background
+        .on("mouseenter", function () {
+          select(this)
+            .select("rect.background")
+            .attr("fill", "rgba(0, 0, 0, 0.2)");
+        })
+        .on("mouseleave", function () {
+          select(this).select("rect.background").attr("fill", "transparent");
+        })
+        // Ajout des rectangles pour le background
+        .call((g) => {
+          g.selectAll("rect.background")
+            .data([null])
+            .join("rect")
+            .attr("class", "background")
+            .attr("x", -40)
+            .attr("y", 0)
+            .attr("width", 75)
+            .attr("height", svgHeight)
+            .attr("fill", "transparent");
+
+          // Création des barres pour représenter les données Kg
+          g.selectAll("g.kilogram")
+            .data((d) => [d.kilogram])
+            .join("g")
+            .attr("class", "kilogram")
+            .attr("transform", `translate(-20, 0)`)
+            .call((g) => {
+              g.append("rect")
+                .attr("x", 0)
+                .attr("y", (d) => yScaleKilogram(d))
+                .attr("width", 10)
+                .attr("height", (d) => svgHeight - yScaleKilogram(d))
+                .attr("fill", variables.darkgrey);
+              g.append("path")
+                .attr(
+                  "d",
+                  (d) => `
+               M 0 ${yScaleKilogram(d)} 
+               Q 5 ${yScaleKilogram(d) - 5} 10 ${yScaleKilogram(d)} 
+               L 10 ${yScaleKilogram(d) + (svgHeight - yScaleKilogram(d))} 
+               L 0 ${yScaleKilogram(d) + (svgHeight - yScaleKilogram(d))} 
+               Z
+             `
+                )
+                .attr("fill", variables.darkgrey);
+            });
+          // Création des barres pour représenter les données kCal
+          g.selectAll("g.calories")
+            .data((d) => [d.calories])
+            .join("g")
+            .attr("class", "calories")
+            .attr("transform", `translate(${barWidth / 2}, 0)`)
+            .call((g) => {
+              g.append("rect")
+                .attr("x", 0)
+                .attr("y", (d) => yScaleCalories(d))
+                .attr("width", 10)
+                .attr("height", (d) => svgHeight - yScaleCalories(d))
+                .attr("fill", variables.red);
+              g.append("path")
+                .attr(
+                  "d",
+                  (d) => `
+               M 0 ${yScaleCalories(d)} 
+               Q 5 ${yScaleCalories(d) - 5} 10 ${yScaleCalories(d)} 
+               L 10 ${yScaleCalories(d) + (svgHeight - yScaleCalories(d))} 
+               L 0 ${yScaleCalories(d) + (svgHeight - yScaleCalories(d))} 
+               Z
+             `
+                )
+                .attr("fill", variables.red);
+            });
+        });
+
+      // Hover permettant l'affichage du tooltip affichant les données liées au groupe ciblé
+      barGroups
+        .on("mouseover", function (_, d) {
+          tooltip.style.visibility = "visible";
+          tooltip.innerHTML = `
+    <div class="tooltip-content">
+      <span>${d.kilogram}kg</span>
+      <span>${d.calories}kCal</span>
+    </div>
+    `;
+        })
+        .on("mouseout", function () {
+          tooltip.style.visibility = "hidden";
+        })
+        // Position dynamique du tooltip
+        .on("mousemove", function (event) {
+          tooltip.style.top = event.pageY - 300 + "px";
+          tooltip.style.left = event.pageX - 120 + "px";
+        });
+
+      // Titre du graphique
+      selection
+        .selectAll("text.title")
+        .data([null])
+        .join("text")
+        .attr("x", width / legends.length / 4)
+        .attr("text-anchor", "middle")
+        .attr("y", -50)
+        .attr("font-size", "16px")
+        .attr("font-weight", "600")
+        .text("Activité quotidienne");
+
+      // Axe X avec ses légendes
+      selection
+        .selectAll("text.x-axis")
+        .data(user?.sessions.map((_, i) => `${i + 1}`) || [])
+        .join("text")
+        .attr("class", "x-axis")
+        .attr("x", (d) => xScale(d)!)
+        .attr("y", svgHeight + 25)
+        .attr("text-anchor", "middle")
+        .attr("font-weight", "800")
+        .attr("fill", "grey")
+        .attr("font-size", "12px")
+        .text((d) => d);
+
+      // Axe Y avec ses légendes
+      selection
+        .selectAll("text.y-axis")
+        .data(tickValuesKg)
+        .join("text")
+        .attr("class", "y-axis")
+        .attr("x", () => width - 10)
+        .attr("y", (d) => yScaleKilogram(d) + 4)
+        .attr("text-anchor", "middle")
+        .attr("font-weight", "800")
+        .attr("fill", "grey")
+        .attr("font-size", "12px")
+        .text((d) => d);
+
+      // Légendes générales
+      selection
+        .selectAll("g.legend")
+        .data(legends)
+        .join("g")
+        .attr("class", "legend")
+        .attr(
+          "transform",
+          (_, i) => `translate(${width / legends.length + i * 100 + 160}, -50)`
+        )
+
+        // Création de des légendes selon les data legends injectées
+        .call((g) => {
+          g.append("circle")
+            .attr("cx", 0)
+            .attr("cy", -5)
+            .attr("r", 5)
+            .attr("fill", (d) => d.color);
+
+          g.append("text")
+            .attr("x", 10)
+            .attr("y", 0)
+            .attr("font-size", "12px")
+            .text((d) => d.text);
+        });
+    }
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, [selection, width, user, minKg, maxKg, maxCalories]);
+  return (
+    <div className="bars-chart" style={{ paddingTop: "100px" }}>
+      {/* Création du SVG avec ses dimensions permettant son affichage dans le DOM */}
+      <svg
+        ref={ref}
+        width={width}
+        height={250}
+        style={{ overflow: "visible" }}
+      ></svg>
+    </div>
+  );
+}
