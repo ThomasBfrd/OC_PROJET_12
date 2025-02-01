@@ -8,8 +8,8 @@ export const getAllUserData = async (type: string, userId?: string) => {
                 fetch(`http://localhost:3000/user/${userId}/average-sessions`),
             ])
 
-            const statuses = await Promise.all(data.map(response => response.status))
-            if (statuses.some((status) => status !== 200)) {
+            const status = await Promise.all(data.map(response => response.status))
+            if (status.some((status) => status !== 200)) {
                 throw new Error(); 
             }
 
@@ -29,8 +29,8 @@ export const getAllUserData = async (type: string, userId?: string) => {
                 fetch('/user-average-sessions.json'),
             ])
 
-            const statuses = await Promise.all(data.map((response) => response.status));
-            if (statuses.some((status) => status !== 200)) {
+            const status = await Promise.all(data.map((response) => response.status));
+            if (status.some((status) => status !== 200)) {
                 throw new Error();
             }
 
