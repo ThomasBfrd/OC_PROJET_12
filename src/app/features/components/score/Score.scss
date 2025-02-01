@@ -1,0 +1,12 @@
+@use '/src/assets/styles/variables.module.scss' as *;
+
+.percent {
+    font-weight: bold;
+    fill: $darkgrey;
+    font-size: 1.5rem;
+}
+
+.details {
+    font-weight: 500;
+    fill: $lightgreytext;
+}

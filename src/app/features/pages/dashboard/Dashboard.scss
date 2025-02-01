@@ -1,0 +1,352 @@
+@use '/src/assets/styles/variables.module.scss' as *;
+@use '/src/assets/styles/queries.scss';
+
+.dashboard {
+	height: 100%;
+	padding: 80px 80px 0 80px;
+	margin-left: 80px;
+	position: relative;
+
+	& .error__toast {
+		z-index: 50;
+		position: absolute;
+		// right: -300px;
+		bottom: 120px;
+		width: 280px;
+		height: 80px;
+		background-color: red;
+		opacity: 0.9;
+		border-radius: 8px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		animation: error-toast 0.4s forwards cubic-bezier(.36,.48,.35,1.04);
+		animation: error-toast-disparition 0.8s 3s forwards cubic-bezier(.36,.48,.35,1.04);
+		
+		&-text {
+			padding: 15px;
+			color: white;
+			font-weight: normal;
+			text-wrap: balance;
+		}
+	}
+	
+	& .disparition {
+		right: 0;
+		bottom: 0;
+		animation: error-toast-disparition 0.8s 3s forwards cubic-bezier(.36,.48,.35,1.04);
+	}
+
+	.error-message {
+		position: absolute;
+		top: 50dvh;
+		left: 30dvw;
+	}
+}
+
+@keyframes error-toast {
+	from {
+		right: -300px;
+	}
+
+	to {
+		right: 20px;
+	}
+}
+
+@keyframes error-toast-disparition {
+	from {
+		opacity: 0.9;
+	}
+
+	to {
+		opacity: 0;
+	}
+}
+
+.dashboard-background {
+	left:0;
+	top: 0;
+	background-color: white;
+	opacity: 0.8;
+	position: absolute;
+	height: 100dvh;
+	width: 100dvw;
+	z-index: 2;
+}
+
+.loading {
+	z-index: 10;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 50px;
+	aspect-ratio: 1;
+	border-radius: 50%;
+	padding: 3px;
+	background: 
+	  radial-gradient(farthest-side,$red 95%,#0000) 50% 0/12px 12px no-repeat,
+	  radial-gradient(farthest-side,#0000 calc(100% - 5px),$red calc(100% - 4px)) content-box;
+	animation: l6 2s infinite ;
+  }
+  @keyframes l6 {to{transform: rotate(1turn)}
+}
+
+.ladderboard {
+	height: 100%;
+	
+	position: relative;
+	display: grid;
+	grid-column-gap: 20px;
+	justify-content: space-between;
+
+	& .cards {
+		grid-area: 1 / 9 / 11 / 11;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		height: 100%;
+		padding: 0;
+		margin: 0 0 0 20px;
+
+		& .card-list {
+			list-style: none;
+			height: 100%;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: space-between;
+			padding: 0;
+			margin: 0;
+
+		
+			& .card-item {
+				border-radius: 15px;
+				margin: 0;
+			}
+		}
+	}
+	
+	& .activity {
+		grid-area: 4 / 1 / 7 / 9;
+		background-color: $lightbackground;
+		display: flex;
+	  justify-content: center;
+	  align-items: center;
+	  border-radius: 8px;
+	  margin-bottom: 30px;
+	}
+
+	& .graphic-squares {
+		grid-area: 7 / 1 / 11 / 9;
+		display: flex;
+		justify-content: space-between;
+		gap: 15px;
+
+		& .average-sessions {
+			grid-area: 7 / 1 / 11 / 4;
+			height: 250px;
+			// width: 100%;
+			max-width: 300px;
+			background-color: $red;
+			border-radius: 8px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+		
+		& .performances {
+			grid-area: 7 / 4 / 11 / 7;
+			background-color: $darkgrey;
+			height: 250px;
+			max-width: 300px;
+			border-radius: 8px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+	
+		}
+		
+		& .score {
+			grid-area: 7 / 7 / 11 / 9;
+			background-color: $lightbackground;
+			height: 250px;
+			max-width: 300px;
+			border-radius: 8px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+	}
+	
+}
+
+.dashboard__header {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	.resume {
+		flex: 1;
+		grid-area: 1 / 1 / 4 / 9;
+		margin-bottom: 0px;
+		text-align: start;
+	
+		& .infos {
+			margin-right: 20px;
+			display: flex;
+			justify-content: start;
+			align-items: center;
+			line-height: 0;
+	
+			& .name {
+				color: $red;
+				margin-left: 10px;
+
+				& .datasource {
+					font-size: 0.9rem;
+					margin-left: 10px;
+					font-weight: normal;
+					color: black;
+				}
+			}
+		}
+	}
+
+	& .switch {
+		flex: 1;
+		display: flex;
+		flex-direction: row;
+		justify-content: flex-end;
+		align-items: center;
+		margin-bottom: 50px;
+		gap: 2%;
+		padding-top: 50px;
+		margin-right: 20px;
+	}
+}
+
+input[type=checkbox] {
+	height: 0;
+	width: 0;
+	visibility: hidden;
+}
+
+label {
+	cursor: pointer;
+	text-indent: -9999px;
+	width: 60px;
+	height: 30px;
+	background: $lightgreytext;
+	display: block;
+	border-radius: 100px;
+	position: relative;
+}
+
+label:after {
+	content: '';
+	position: absolute;
+	top: 2.4px;
+	left: 5px;
+	width: 25px;
+	height: 25px;
+	background: #fff;
+	border-radius: 90px;
+	transition: 0.3s;
+}
+
+input:checked+label {
+	background: $darkgrey;
+}
+
+input:checked+label:after {
+	left: calc(100% - 5px);
+	transform: translateX(-100%);
+}
+
+
+@media screen and (max-width: 1440px) {
+	.dashboard {
+		padding: 100px 20px 0 80px;
+		margin-left: 80px;
+		// overflow: hidden;
+	}
+
+	// height: 100%;
+	// padding: 80px 80px 0 80px;
+	// margin-left: 80px;
+	// position: relative;
+
+    .ladderboard {
+        
+        position: relative;
+        display: grid;
+        grid-column-gap: 0px;
+        grid-row-gap: 0px;
+		justify-content: space-between;
+		width: 100%;
+    
+        & .cards {
+            grid-area: 1 / 1 / 4 / 12;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            margin: 0 0 15px 0;
+    
+            & .card-list {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0;
+                margin: 0;
+            }
+        }
+        
+        & .activity {
+            grid-area: 4 / 1 / 7 / 12;
+            height: 350px;
+        }
+
+		& .graphic-squares {
+			grid-area: 7 / 1 / 11 / 12;
+			display: flex;
+			justify-content: center;
+			gap: 40px;
+		}
+        
+    }
+
+	.dashboard__header {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 100%;
+	
+		.resume {
+			flex: 1;
+			grid-area: 1 / 1 / 4 / 9;
+			margin-bottom: 0px;
+		
+			& .infos {
+				margin-right: 20px;
+				display: flex;
+				justify-content: start;
+				align-items: center;
+				line-height: 0;
+		
+				& .name {
+					color: $red;
+					margin-left: 10px;
+				}
+			}
+		}
+	
+		& .switch {
+			flex: 0.5;
+			display: flex;
+			padding-top: 30px;
+			margin-right: 20px;
+		}
+	}
+}

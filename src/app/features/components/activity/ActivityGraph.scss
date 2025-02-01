@@ -1,0 +1,24 @@
+.tooltip {
+    position: absolute;
+    visibility: hidden;
+    z-index: 99;
+    background-color: #E60000;
+    padding: 15px 8px;
+    border-radius: 3px;
+    color: white;
+    font-size: 0.8rem;
+    pointer-events: none;
+
+    & .tooltip-content {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+}
+
+.bars-chart {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+}
