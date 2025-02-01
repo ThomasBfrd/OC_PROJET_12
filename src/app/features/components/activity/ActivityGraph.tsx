@@ -1,15 +1,15 @@
 import { scaleBand, scaleLinear, select, Selection } from "d3";
 import { useEffect, useRef, useState } from "react";
 import "./ActivityGraph.scss";
-import variables from '/src/assets/styles/variables.module.scss';
-import { UserActivity } from "../../../app/core/interfaces/user-activity";
+import variables from "/src/assets/styles/variables.module.scss";
+import { UserActivity } from "../../../core/interfaces/user-activity";
 
 const legends = [
   { color: variables.darkgrey, text: "Poids (kg)" },
   { color: variables.red, text: "Calories brûlées (kCal)" },
 ];
 
-export default function ActivityGraph({user}: {user: UserActivity | null}) {
+export default function ActivityGraph({ user }: { user: UserActivity | null }) {
   const ref = useRef<SVGSVGElement | null>(null);
   const [selection, setSelection] = useState<null | Selection<
     SVGSVGElement | null,
@@ -17,7 +17,7 @@ export default function ActivityGraph({user}: {user: UserActivity | null}) {
     null,
     undefined
   >>(null);
-  const [width, setWidth] = useState<number>(250)
+  const [width, setWidth] = useState<number>(250);
 
   const kg = user?.sessions.map((element) => element.kilogram) || [];
   const minKg = Math.min(...kg) - 3;
@@ -39,13 +39,13 @@ export default function ActivityGraph({user}: {user: UserActivity | null}) {
         return 750;
       }
     }
-    
+
     const handleResize = () => {
       const newWidth = calculateWidth(window.innerWidth);
       setWidth(newWidth);
       selection?.attr("width", newWidth);
     };
-  
+
     window.addEventListener("resize", handleResize);
     handleResize();
 
@@ -65,14 +65,13 @@ export default function ActivityGraph({user}: {user: UserActivity | null}) {
     const yScaleCalories = scaleLinear()
       .domain([0, maxCalories])
       .range([svgHeight, 0]);
-      
-      // Généralisation des repères horizontaux en pointillés, déterminant leur position en calculant la médiane des valeurs reçues
-      const tickValuesKg = [minKg, (minKg + maxKg) / 2, maxKg];
-      
+
+    // Généralisation des repères horizontaux en pointillés, déterminant leur position en calculant la médiane des valeurs reçues
+    const tickValuesKg = [minKg, (minKg + maxKg) / 2, maxKg];
+
     if (!selection) {
       setSelection(select(ref.current));
     } else {
-
       selection.selectAll("*").remove();
 
       // REPERE HORIZONTAUX
@@ -82,18 +81,18 @@ export default function ActivityGraph({user}: {user: UserActivity | null}) {
         .join("line")
         .attr("class", "grid")
         .attr("x1", 0)
-        .attr("x2", width - (padding * 10))
+        .attr("x2", width - padding * 10)
         .attr("y1", (d) => yScaleKilogram(d))
         .attr("y2", (d) => yScaleKilogram(d))
         .attr("stroke", variables.lightgrey)
         .attr("stroke-dasharray", "5,5")
-        .attr("transform", "translate(50, 0)")
+        .attr("transform", "translate(50, 0)");
 
       // TOOLTIP
       // Création du tooltip dans le DOM
       const tooltip = document.createElement("div");
       tooltip.classList.add("tooltip");
-      const svgInDom = document.querySelector('.bars-chart');
+      const svgInDom = document.querySelector(".bars-chart");
       svgInDom?.appendChild(tooltip);
 
       // GROUPBAR : Création des barres
@@ -110,9 +109,7 @@ export default function ActivityGraph({user}: {user: UserActivity | null}) {
             .attr("fill", "rgba(0, 0, 0, 0.2)");
         })
         .on("mouseleave", function () {
-          select(this)
-            .select("rect.background")
-            .attr("fill", "transparent");
+          select(this).select("rect.background").attr("fill", "transparent");
         })
         // Ajout des rectangles pour le background
         .call((g) => {
@@ -127,51 +124,57 @@ export default function ActivityGraph({user}: {user: UserActivity | null}) {
             .attr("fill", "transparent");
 
           // Création des barres pour représenter les données Kg
-         g.selectAll("g.kilogram")
-         .data((d) => [d.kilogram])
-         .join("g")
-         .attr("class", "kilogram")
-         .attr("transform", `translate(-20, 0)`)
-         .call((g) => {
-           g.append("rect")
-             .attr("x", 0)
-             .attr("y", (d) => yScaleKilogram(d))
-             .attr("width", 10)
-             .attr("height", (d) => svgHeight - yScaleKilogram(d))
-             .attr("fill", variables.darkgrey);
-            g.append("path")
-             .attr("d", (d) => `
+          g.selectAll("g.kilogram")
+            .data((d) => [d.kilogram])
+            .join("g")
+            .attr("class", "kilogram")
+            .attr("transform", `translate(-20, 0)`)
+            .call((g) => {
+              g.append("rect")
+                .attr("x", 0)
+                .attr("y", (d) => yScaleKilogram(d))
+                .attr("width", 10)
+                .attr("height", (d) => svgHeight - yScaleKilogram(d))
+                .attr("fill", variables.darkgrey);
+              g.append("path")
+                .attr(
+                  "d",
+                  (d) => `
                M 0 ${yScaleKilogram(d)} 
                Q 5 ${yScaleKilogram(d) - 5} 10 ${yScaleKilogram(d)} 
                L 10 ${yScaleKilogram(d) + (svgHeight - yScaleKilogram(d))} 
                L 0 ${yScaleKilogram(d) + (svgHeight - yScaleKilogram(d))} 
                Z
-             `)
-             .attr("fill", variables.darkgrey);
-         });
-        // Création des barres pour représenter les données kCal
-       g.selectAll("g.calories")
-         .data((d) => [d.calories])
-         .join("g")
-         .attr("class", "calories")
-         .attr("transform", `translate(${barWidth / 2}, 0)`)
-         .call((g) => {
-           g.append("rect")
-             .attr("x", 0)
-             .attr("y", (d) => yScaleCalories(d))
-             .attr("width", 10)
-             .attr("height", (d) => svgHeight - yScaleCalories(d))
-             .attr("fill", variables.red);
-            g.append("path")
-             .attr("d", (d) => `
+             `
+                )
+                .attr("fill", variables.darkgrey);
+            });
+          // Création des barres pour représenter les données kCal
+          g.selectAll("g.calories")
+            .data((d) => [d.calories])
+            .join("g")
+            .attr("class", "calories")
+            .attr("transform", `translate(${barWidth / 2}, 0)`)
+            .call((g) => {
+              g.append("rect")
+                .attr("x", 0)
+                .attr("y", (d) => yScaleCalories(d))
+                .attr("width", 10)
+                .attr("height", (d) => svgHeight - yScaleCalories(d))
+                .attr("fill", variables.red);
+              g.append("path")
+                .attr(
+                  "d",
+                  (d) => `
                M 0 ${yScaleCalories(d)} 
                Q 5 ${yScaleCalories(d) - 5} 10 ${yScaleCalories(d)} 
                L 10 ${yScaleCalories(d) + (svgHeight - yScaleCalories(d))} 
                L 0 ${yScaleCalories(d) + (svgHeight - yScaleCalories(d))} 
                Z
-             `)
-             .attr("fill", variables.red);
-         });
+             `
+                )
+                .attr("fill", variables.red);
+            });
         });
 
       // Hover permettant l'affichage du tooltip affichant les données liées au groupe ciblé
@@ -199,7 +202,7 @@ export default function ActivityGraph({user}: {user: UserActivity | null}) {
         .selectAll("text.title")
         .data([null])
         .join("text")
-        .attr("x", (width / legends.length) / 4)
+        .attr("x", width / legends.length / 4)
         .attr("text-anchor", "middle")
         .attr("y", -50)
         .attr("font-size", "16px")
@@ -240,7 +243,10 @@ export default function ActivityGraph({user}: {user: UserActivity | null}) {
         .data(legends)
         .join("g")
         .attr("class", "legend")
-        .attr("transform", (_, i) => `translate(${(width / legends.length) + (i * 100) + 160}, -50)`)
+        .attr(
+          "transform",
+          (_, i) => `translate(${width / legends.length + i * 100 + 160}, -50)`
+        )
 
         // Création de des légendes selon les data legends injectées
         .call((g) => {

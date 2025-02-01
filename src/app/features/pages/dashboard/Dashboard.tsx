@@ -1,24 +1,28 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch } from "../../../app/core/store";
+import { AppDispatch } from "../../../core/store";
 import {
   selectDataSource,
   selectStatus,
   selectUsers,
-} from "../../../app/core/selectors";
+} from "../../../core/selectors";
 import ActivityGraph from "../../components/activity/ActivityGraph";
 import "./Dashboard.scss";
 import Score from "../../components/score/Score";
 import Performances from "../../components/performances/Performances";
 import Card from "../../components/card/Card";
 import AverageSessions from "../../components/average-sessions/AverageSessions";
-import { fetchApiUserAllData, fetchLocalUserAllData, switchDataSource } from "../../../app/core/userSlice";
-import { User } from "../../../app/core/interfaces/user";
+import {
+  fetchApiUserAllData,
+  fetchLocalUserAllData,
+  switchDataSource,
+} from "../../../core/userSlice";
+import { User } from "../../../core/interfaces/user";
 import { useParams } from "react-router";
-import { UserData } from "../../../app/core/interfaces/user-infos.interface";
-import { UserAverageSession } from "../../../app/core/interfaces/user-average";
-import { UserActivity } from "../../../app/core/interfaces/user-activity";
-import { UserPerformances } from "../../../app/core/interfaces/user-performance";
+import { UserData } from "../../../core/interfaces/user-infos.interface";
+import { UserAverageSession } from "../../../core/interfaces/user-average";
+import { UserActivity } from "../../../core/interfaces/user-activity";
+import { UserPerformances } from "../../../core/interfaces/user-performance";
 
 export default function Dashboard() {
   const params = useParams();
@@ -35,78 +39,96 @@ export default function Dashboard() {
     const userId = params.userId;
 
     if (!users.localAllData && !isLocalFetched) {
-      setIsLocalFetched(true)
+      setIsLocalFetched(true);
       dispatch(fetchLocalUserAllData());
     }
 
     if (userId && !isApiFetched && isChecked) {
       dispatch(fetchApiUserAllData(userId));
     }
-    
+
     const getUserFromStore = () => {
       const localUserWithUserId: User = {
-        data: users.localAllData.data ? 
-          users.localAllData.data.filter((user: UserData) => user.id.toString() === userId)[0] : [],
-        userAverage: users.localAllData.averageSession ? 
-          users.localAllData.averageSession.filter((user: UserAverageSession) => user.userId.toString() === userId)[0] : [],
-        userActivity: users.localAllData.activity ? 
-          users.localAllData.activity.filter((user: UserActivity) => user.userId.toString() === userId)[0] : [],
-        userPerformances: users.localAllData.performances ? 
-          users.localAllData.performances.filter((user: UserPerformances) => user.userId.toString() === userId)[0] : [],
-        }
-      
-        const user: User =
+        data: users.localAllData.data
+          ? users.localAllData.data.filter(
+              (user: UserData) => user.id.toString() === userId
+            )[0]
+          : [],
+        userAverage: users.localAllData.averageSession
+          ? users.localAllData.averageSession.filter(
+              (user: UserAverageSession) => user.userId.toString() === userId
+            )[0]
+          : [],
+        userActivity: users.localAllData.activity
+          ? users.localAllData.activity.filter(
+              (user: UserActivity) => user.userId.toString() === userId
+            )[0]
+          : [],
+        userPerformances: users.localAllData.performances
+          ? users.localAllData.performances.filter(
+              (user: UserPerformances) => user.userId.toString() === userId
+            )[0]
+          : [],
+      };
+
+      const user: User =
         dataSource === "local" ? localUserWithUserId : users.apiAllData;
-        
-        if (
-          user &&
-          user.data &&
-          user.userAverage &&
-          user.userAverage &&
-          user.userPerformances
-        ) {
-          setUserFromStore({
-            userAverage: Array.isArray(user.userAverage)
+
+      if (
+        user &&
+        user.data &&
+        user.userAverage &&
+        user.userAverage &&
+        user.userPerformances
+      ) {
+        setUserFromStore({
+          userAverage: Array.isArray(user.userAverage)
             ? user.userAverage
             : [user.userAverage],
-            userActivity: Array.isArray(user.userActivity)
+          userActivity: Array.isArray(user.userActivity)
             ? user.userActivity
-              : [user.userActivity],
-              userPerformances: Array.isArray(user.userPerformances)
-              ? user.userPerformances
-              : [user.userPerformances],
-              data: Array.isArray(user.data) ? user.data : [user.data],
-            });
-        }
-    };
-    if (status === 'succeeded') {
-
-      if (dataSource === 'api' && !isApiFetched) {
-        setIsApiFetched(true)
-      } else if (dataSource === 'local' && !isLocalFetched) {
-        setIsLocalFetched(true)
+            : [user.userActivity],
+          userPerformances: Array.isArray(user.userPerformances)
+            ? user.userPerformances
+            : [user.userPerformances],
+          data: Array.isArray(user.data) ? user.data : [user.data],
+        });
       }
-      
+    };
+    if (status === "succeeded") {
+      if (dataSource === "api" && !isApiFetched) {
+        setIsApiFetched(true);
+      } else if (dataSource === "local" && !isLocalFetched) {
+        setIsLocalFetched(true);
+      }
+
       getUserFromStore();
     }
 
     if (status === "failed") {
-      
-      if (dataSource === 'api') {
-        setIsApiFetched(false)
+      if (dataSource === "api") {
+        setIsApiFetched(false);
         dispatch(switchDataSource());
-
-      } else if (dataSource === 'local') {
-        setIsLocalFetched(false)
+      } else if (dataSource === "local") {
+        setIsLocalFetched(false);
       }
       setIsChecked(false);
     }
 
     return () => {};
-  }, [dataSource, users.localAllData, users.apiAllData, isApiFetched, isLocalFetched, status, dispatch, isChecked, params.userId]);
+  }, [
+    dataSource,
+    users.localAllData,
+    users.apiAllData,
+    isApiFetched,
+    isLocalFetched,
+    status,
+    dispatch,
+    isChecked,
+    params.userId,
+  ]);
 
   const handleSwitch = () => {
-
     setIsChecked(!isChecked);
     dispatch(switchDataSource());
     setIsApiFetched(false);
@@ -123,9 +145,9 @@ export default function Dashboard() {
                 <h1>
                   Bonjour
                   <span className="name">
-                    {userFromStore.data[0].userInfos.firstName} 
+                    {userFromStore.data[0].userInfos.firstName}
                     <span className="datasource">
-                      (données {dataSource === 'local' ? 'locales' : 'API'})
+                      (données {dataSource === "local" ? "locales" : "API"})
                     </span>
                   </span>
                 </h1>
@@ -177,7 +199,7 @@ export default function Dashboard() {
     );
   }
 
-  if (dataSource === 'api' && status === 'failed') {
+  if (dataSource === "api" && status === "failed") {
     return (
       <div className="dashboard">
         <div className="error__toast">
@@ -187,7 +209,7 @@ export default function Dashboard() {
         </div>
         {renderContent()}
       </div>
-    )
+    );
   }
 
   return (

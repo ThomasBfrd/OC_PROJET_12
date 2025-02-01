@@ -6,7 +6,7 @@ import "./Performance.scss";
 import {
   KindTransform,
   UserPerformances,
-} from "../../../app/core/interfaces/user-performance";
+} from "../../../core/interfaces/user-performance";
 
 export default function Performances({ user }: { user: UserPerformances }) {
   const ref = useRef<SVGSVGElement | null>(null);
