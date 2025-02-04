@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch } from "../../../core/store";
 import {
   selectDataSource,
   selectStatus,
@@ -23,6 +22,7 @@ import { UserData } from "../../../core/interfaces/user-infos.interface";
 import { UserAverageSession } from "../../../core/interfaces/user-average";
 import { UserActivity } from "../../../core/interfaces/user-activity";
 import { UserPerformances } from "../../../core/interfaces/user-performance";
+import { AppDispatch } from "../../../core/types/store-types";
 
 export default function Dashboard() {
   const params = useParams();
