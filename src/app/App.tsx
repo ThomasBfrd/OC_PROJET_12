@@ -37,7 +37,6 @@ function App() {
         <Header />
         <Routes>
           <Route path="/" element={<Home />}></Route>
-          <Route path="/dashboard" element={<Dashboard />}></Route>
           <Route path="/dashboard/:userId" element={<Dashboard />}></Route>
           <Route
             path="*"
