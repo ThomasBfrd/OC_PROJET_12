@@ -39,7 +39,6 @@ export default function Dashboard() {
     const userId = params.userId;
 
     if (!users.localAllData && !isLocalFetched) {
-      setIsLocalFetched(true);
       dispatch(fetchLocalUserAllData());
     }
 
