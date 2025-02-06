@@ -74,7 +74,12 @@ const userSlice = createSlice({
         state.status = "succeeded";
 
         if (action.payload) {
-          state.localAllData = action.payload;
+          state.localAllData = {
+            data: action.payload.data,
+            activity: action.payload.activity,
+            performances: action.payload.performances,
+            averageSession: action.payload.averageSession,
+          };
         }
       })
       .addCase(fetchLocalUserAllData.rejected, (state) => {
