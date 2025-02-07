@@ -17,22 +17,19 @@ const initialState: UserState = {
   },
   dataSource: "local",
   status: "idle",
-  userId: '12'
+  userId: ''
 };
 
 // Requête LOCALE - ALL DATA
 export const fetchLocalUserAllData = createAsyncThunk(
   "user/fetchLocalUserAllData",
-  async () => {
-    const response = await getAllUserData("local");
+  async (userId: string) => {
+    const response = await getAllUserData("local", userId);
     
-    if (response) {
-      return {
-        data: response[0],
-        activity: response[1],
-        performances: response[2],
-        averageSession: response[3],
-      };
+    if (response) { 
+      return response;
+    } else {
+      throw new Error("Erreur dans la récupération de données");
     }
   }
 );
@@ -43,15 +40,9 @@ export const fetchApiUserAllData = createAsyncThunk(
   async (userId: string) => {
     const response = await getAllUserData("api", userId);
     if (response) {
-      return {
-        data: response[0],
-        activity: response[1],
-        performances: response[2],
-        averageSession: response[3],
-      };
+      return response;
     } else {
       throw new Error("Erreur dans la récupération de données");
-      
     }
   }
 );
@@ -95,10 +86,10 @@ const userSlice = createSlice({
 
         if (action.payload) {
           state.apiAllData = {
-            data: action.payload.data.data,
-            activity: action.payload.activity.data,
-            performances: action.payload.performances.data,
-            averageSession: action.payload.averageSession.data,
+            data: action.payload.data,
+            activity: action.payload.activity,
+            performances: action.payload.performances,
+            averageSession: action.payload.averageSession,
           };
         }
       })

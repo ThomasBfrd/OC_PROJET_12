@@ -18,10 +18,6 @@ import {
 } from "../../../core/userSlice";
 import { User } from "../../../core/interfaces/user";
 import { useParams } from "react-router";
-import { UserData } from "../../../core/interfaces/user-infos.interface";
-import { UserAverageSession } from "../../../core/interfaces/user-average";
-import { UserActivity } from "../../../core/interfaces/user-activity";
-import { UserPerformances } from "../../../core/interfaces/user-performance";
 import { AppDispatch } from "../../../core/types/store-types";
 
 export default function Dashboard() {
@@ -38,63 +34,43 @@ export default function Dashboard() {
   useEffect(() => {
     const userId = params.userId;
 
-    if (!users.localAllData && !isLocalFetched) {
-      dispatch(fetchLocalUserAllData());
-    }
 
     if (userId && !isApiFetched && isChecked) {
       dispatch(fetchApiUserAllData(userId));
     }
 
     const getUserFromStore = () => {
-      const localUserWithUserId: User = {
-        data: users.localAllData.data
-          ? users.localAllData.data.filter(
-              (user: UserData) => user.id.toString() === userId
-            )[0]
-          : [],
-        userAverage: users.localAllData.averageSession
-          ? users.localAllData.averageSession.filter(
-              (user: UserAverageSession) => user.userId.toString() === userId
-            )[0]
-          : [],
-        userActivity: users.localAllData.activity
-          ? users.localAllData.activity.filter(
-              (user: UserActivity) => user.userId.toString() === userId
-            )[0]
-          : [],
-        userPerformances: users.localAllData.performances
-          ? users.localAllData.performances.filter(
-              (user: UserPerformances) => user.userId.toString() === userId
-            )[0]
-          : [],
-      };
 
       const user: User =
-        dataSource === "local" ? localUserWithUserId : users.apiAllData;
+        dataSource === "local" ? users.localAllData : users.apiAllData;
 
       if (
         user &&
         user.data &&
-        user.userAverage &&
-        user.userAverage &&
-        user.userPerformances
+        user.averageSession &&
+        user.activity &&
+        user.performances
       ) {
+
         setUserFromStore({
-          userAverage: Array.isArray(user.userAverage)
-            ? user.userAverage
-            : [user.userAverage],
-          userActivity: Array.isArray(user.userActivity)
-            ? user.userActivity
-            : [user.userActivity],
-          userPerformances: Array.isArray(user.userPerformances)
-            ? user.userPerformances
-            : [user.userPerformances],
-          data: Array.isArray(user.data) ? user.data : [user.data],
+          averageSession: user.averageSession,
+          activity: user.activity,
+          performances: user.performances,
+          data: user.data,
         });
       }
     };
-    if (status === "succeeded") {
+
+    if (
+      userId &&
+      users.localAllData &&
+      dataSource === "local" &&
+      !isLocalFetched
+    ) {
+      dispatch(fetchLocalUserAllData(userId));
+    }
+
+    if (status === "succeeded" && !isLocalFetched || !isApiFetched) {
       if (dataSource === "api" && !isApiFetched) {
         setIsApiFetched(true);
       } else if (dataSource === "local" && !isLocalFetched) {
@@ -105,33 +81,30 @@ export default function Dashboard() {
     }
 
     if (status === "failed") {
+      
       if (dataSource === "api") {
-        setIsApiFetched(false);
+        setIsApiFetched(true);
         dispatch(switchDataSource());
+        setIsChecked(false);
       } else if (dataSource === "local") {
-        setIsLocalFetched(false);
+        console.log('données non récupérées');
+        setIsLocalFetched(true);
       }
-      setIsChecked(false);
     }
 
     return () => {};
   }, [
     dataSource,
-    users.localAllData,
-    users.apiAllData,
     isApiFetched,
-    isLocalFetched,
-    status,
-    dispatch,
     isChecked,
+    isLocalFetched,
     params.userId,
+    status
   ]);
 
   const handleSwitch = () => {
     setIsChecked(!isChecked);
     dispatch(switchDataSource());
-    setIsApiFetched(false);
-    setIsLocalFetched(false);
   };
 
   const renderContent = () => (
@@ -144,7 +117,7 @@ export default function Dashboard() {
                 <h1>
                   Bonjour
                   <span className="name">
-                    {userFromStore.data[0].userInfos.firstName}
+                    {userFromStore.data.userInfos.firstName}
                     <span className="datasource">
                       (données {dataSource === "local" ? "locales" : "API"})
                     </span>
@@ -166,20 +139,20 @@ export default function Dashboard() {
           </div>
           <div className="ladderboard">
             <div className="cards">
-              <Card userKeyData={userFromStore.data[0].keyData} />
+              <Card userKeyData={userFromStore.data.keyData} />
             </div>
             <div className="activity">
-              <ActivityGraph user={userFromStore.userActivity[0]} />
+              <ActivityGraph user={userFromStore.activity} />
             </div>
             <div className="graphic-squares">
               <div className="average-sessions">
-                <AverageSessions user={userFromStore.userAverage[0]} />
+                <AverageSessions user={userFromStore.averageSession} />
               </div>
               <div className="performances">
-                <Performances user={userFromStore.userPerformances[0]} />
+                <Performances user={userFromStore.performances} />
               </div>
               <div className="score">
-                <Score user={userFromStore.data[0].todayScore} />
+                <Score user={userFromStore.data.todayScore} />
               </div>
             </div>
           </div>
@@ -213,7 +186,7 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard">
-      {users && userFromStore ? (
+      {users && userFromStore? (
         renderContent()
       ) : (
         <div className="error-message">
