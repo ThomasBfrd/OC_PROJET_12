@@ -5,16 +5,16 @@ import { UserPerformances } from "./user-performance";
 
 export interface UserState {
     localAllData: {
-      data: UserData[] | null;
-      activity: UserActivity[] | null;
-      performances: UserPerformances[] | null;
-      averageSession: UserAverageSession[] | null;
+      data: UserData | null;
+      activity: UserActivity | null;
+      performances: UserPerformances | null;
+      averageSession: UserAverageSession | null;
     };
     apiAllData: {
-      data: UserData[] | null;
-      activity: UserActivity[] | null;
-      performances: UserPerformances[] | null;
-      averageSession: UserAverageSession[] | null;
+      data: UserData | null;
+      activity: UserActivity | null;
+      performances: UserPerformances | null;
+      averageSession: UserAverageSession | null;
     };
     dataSource: "local" | "api";
     status: "idle" | "loading" | "succeeded" | "failed";

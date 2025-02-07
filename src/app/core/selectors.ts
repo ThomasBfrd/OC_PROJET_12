@@ -1,5 +1,6 @@
-import { RootState } from "./store";
+import { StoreState } from "./types/store-types";
 
-export const selectUsers = (state: RootState) => state.users;
-export const selectDataSource = (state: RootState) => state.users.dataSource;
-export const selectStatus = (state: RootState) => state.users.status;
+
+export const selectUsers = (state: StoreState) => state.users;
+export const selectDataSource = (state: StoreState) => state.users.dataSource;
+export const selectStatus = (state: StoreState) => state.users.status;
