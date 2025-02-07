@@ -70,7 +70,7 @@ export default function Dashboard() {
       dispatch(fetchLocalUserAllData(userId));
     }
 
-    if (status === "succeeded") {
+    if (status === "succeeded" && !isLocalFetched || !isApiFetched) {
       if (dataSource === "api" && !isApiFetched) {
         setIsApiFetched(true);
       } else if (dataSource === "local" && !isLocalFetched) {
@@ -81,26 +81,25 @@ export default function Dashboard() {
     }
 
     if (status === "failed") {
+      
       if (dataSource === "api") {
-        setIsApiFetched(false);
+        setIsApiFetched(true);
         dispatch(switchDataSource());
+        setIsChecked(false);
       } else if (dataSource === "local") {
-        setIsLocalFetched(false);
+        console.log('données non récupérées');
+        setIsLocalFetched(true);
       }
-      setIsChecked(false);
     }
 
     return () => {};
   }, [
     dataSource,
-    dispatch,
     isApiFetched,
     isChecked,
     isLocalFetched,
     params.userId,
-    status,
-    users.apiAllData,
-    users.localAllData,
+    status
   ]);
 
   const handleSwitch = () => {
@@ -187,7 +186,7 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard">
-      {users && userFromStore ? (
+      {users && userFromStore? (
         renderContent()
       ) : (
         <div className="error-message">
